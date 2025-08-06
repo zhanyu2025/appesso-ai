@@ -1,19 +1,7 @@
 # docker-compose.prod.yml
-version: '3.8'
+version: "3.8"
 
 services:
-  db:
-    image: postgres:14-alpine
-    restart: always
-    env_file:
-      - ./api/.env
-    ports:
-      - "5432:5432"
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - appesso-network
-
   api:
     build:
       context: ./api
@@ -48,4 +36,4 @@ networks:
     driver: bridge
 
 volumes:
-  db-data: 
+  db-data:

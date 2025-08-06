@@ -1,122 +1,313 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+  output   = "./"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                    Int            @id @default(autoincrement())
-  mobile                String?        @unique @db.VarChar(11) // Added mobile field
-  username              String?        @unique @db.VarChar(30)
-  hashedPassword        String?        @db.VarChar(64) // Made hashedPassword optional
-  profile               Profile?
-  posts                 Post[]
-  reposts               Repost[]
-  likes                 Like[]
-  followedBy            User[]         @relation("UserFollows")
-  following             User[]         @relation("UserFollows")
-  sessions              Session[]
-  provider              String?        @db.VarChar(50)
-  sentNotifications     Notification[] @relation("sentNotifications")
-  receivedNotifications Notification[] @relation("receivedNotifications")
-  messages              Message[]      @relation("message")
-  chats                 Chat[]         @relation("chat")
-  chatsParticipatedIn   Chat[]         @relation("chat participant")
-  createdAt             DateTime       @default(now())
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model DATABASECHANGELOG {
+  ID            String   @db.VarChar(255)
+  AUTHOR        String   @db.VarChar(255)
+  FILENAME      String   @db.VarChar(255)
+  DATEEXECUTED  DateTime @db.DateTime(0)
+  ORDEREXECUTED Int
+  EXECTYPE      String   @db.VarChar(10)
+  MD5SUM        String?  @db.VarChar(35)
+  DESCRIPTION   String?  @db.VarChar(255)
+  COMMENTS      String?  @db.VarChar(255)
+  TAG           String?  @db.VarChar(255)
+  LIQUIBASE     String?  @db.VarChar(20)
+  CONTEXTS      String?  @db.VarChar(255)
+  LABELS        String?  @db.VarChar(255)
+  DEPLOYMENT_ID String?  @db.VarChar(10)
+
+  @@ignore
 }
 
-model Profile {
-  id      Int       @id @default(autoincrement())
-  name    String    @db.VarChar(100)
-  bio     String?   @db.VarChar(255)
-  img     String?   @db.VarChar(4000)
-  website String?   @db.VarChar(100)
-  dob     DateTime?
-  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId  Int       @unique
+model DATABASECHANGELOGLOCK {
+  ID          Int       @id
+  LOCKED      Boolean   @db.Bit(1)
+  LOCKGRANTED DateTime? @db.DateTime(0)
+  LOCKEDBY    String?   @db.VarChar(255)
 }
 
-model Post {
-  id           Int      @id @default(autoincrement())
-  content      String   @db.VarChar(255)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       Int
-  reposts      Repost[]
-  likes        Like[]
-  parentPostId Int?
-  parentPost   Post?    @relation("PostReplies", fields: [parentPostId], references: [id])
-  replies      Post[]   @relation("PostReplies")
-  createdAt    DateTime @default(now())
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_agent {
+  id                String    @id @db.VarChar(32)
+  user_id           BigInt?
+  agent_code        String?   @db.VarChar(36)
+  agent_name        String?   @db.VarChar(64)
+  asr_model_id      String?   @db.VarChar(32)
+  vad_model_id      String?   @db.VarChar(64)
+  llm_model_id      String?   @db.VarChar(32)
+  vllm_model_id     String?   @default("VLLM_ChatGLMVLLM") @db.VarChar(32)
+  tts_model_id      String?   @db.VarChar(32)
+  tts_voice_id      String?   @db.VarChar(32)
+  mem_model_id      String?   @db.VarChar(32)
+  intent_model_id   String?   @db.VarChar(32)
+  system_prompt     String?   @db.Text
+  summary_memory    String?   @db.Text
+  chat_history_conf Int       @default(0) @db.TinyInt
+  lang_code         String?   @db.VarChar(10)
+  language          String?   @db.VarChar(10)
+  sort              Int?      @default(0) @db.UnsignedInt
+  creator           BigInt?
+  created_at        DateTime? @db.DateTime(0)
+  updater           BigInt?
+  updated_at        DateTime? @db.DateTime(0)
+
+  @@index([user_id], map: "idx_ai_agent_user_id")
 }
 
-model Repost {
-  id        Int      @id @default(autoincrement())
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  createdAt DateTime @default(now())
-
-  @@unique([postId, userId])
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_agent_chat_audio {
+  id    String @id @db.VarChar(32)
+  audio Bytes?
 }
 
-model Like {
-  id        Int      @id @default(autoincrement())
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  createdAt DateTime @default(now())
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_agent_chat_history {
+  id          BigInt   @id @default(autoincrement())
+  mac_address String?  @db.VarChar(50)
+  agent_id    String?  @db.VarChar(32)
+  session_id  String?  @db.VarChar(50)
+  chat_type   Int?     @db.TinyInt
+  content     String?  @db.VarChar(1024)
+  audio_id    String?  @db.VarChar(32)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
 
-  @@unique([postId, userId])
+  @@index([agent_id], map: "idx_ai_agent_chat_history_agent_id")
+  @@index([agent_id, session_id, created_at], map: "idx_ai_agent_chat_history_agent_session_created")
+  @@index([mac_address], map: "idx_ai_agent_chat_history_mac")
+  @@index([session_id], map: "idx_ai_agent_chat_history_session_id")
 }
 
-model Session {
-  id             Int      @id @default(autoincrement())
-  refreshToken   String   @unique
-  expirationTime DateTime
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId         Int
-  createdAt      DateTime @default(now())
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_agent_plugin_mapping {
+  id         BigInt @id @default(autoincrement())
+  agent_id   String @db.VarChar(32)
+  plugin_id  String @db.VarChar(32)
+  param_info Json
+
+  @@unique([agent_id, plugin_id], map: "uk_agent_provider")
 }
 
-model Notification {
-  id          Int      @id @default(autoincrement())
-  sender      User     @relation(name: "sentNotifications", fields: [senderId], references: [id], onDelete: Cascade)
-  senderId    Int
-  recipient   User     @relation(name: "receivedNotifications", fields: [recipientId], references: [id], onDelete: Cascade)
-  recipientId Int
-  type        String   @db.VarChar(255)
-  objectType  String   @db.VarChar(255)
-  objectURI   Int
-  read        Boolean  @default(false)
-  createdAt   DateTime @default(now())
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_agent_template {
+  id                String    @id @db.VarChar(32)
+  agent_code        String?   @db.VarChar(36)
+  agent_name        String?   @db.VarChar(64)
+  asr_model_id      String?   @db.VarChar(32)
+  vad_model_id      String?   @db.VarChar(64)
+  llm_model_id      String?   @db.VarChar(32)
+  vllm_model_id     String?   @default("VLLM_ChatGLMVLLM") @db.VarChar(32)
+  tts_model_id      String?   @db.VarChar(32)
+  tts_voice_id      String?   @db.VarChar(32)
+  mem_model_id      String?   @db.VarChar(32)
+  intent_model_id   String?   @db.VarChar(32)
+  system_prompt     String?   @db.Text
+  summary_memory    String?   @db.Text
+  chat_history_conf Int       @default(0) @db.TinyInt
+  lang_code         String?   @db.VarChar(10)
+  language          String?   @db.VarChar(10)
+  sort              Int?      @default(0) @db.UnsignedInt
+  creator           BigInt?
+  created_at        DateTime? @db.DateTime(0)
+  updater           BigInt?
+  updated_at        DateTime? @db.DateTime(0)
 }
 
-model Chat {
-  id            Int       @id @default(autoincrement())
-  user          User      @relation(name: "chat", fields: [userId], references: [id], onDelete: Cascade)
-  userId        Int
-  participant   User      @relation(name: "chat participant", fields: [participantId], references: [id], onDelete: Cascade)
-  participantId Int
-  messages      Message[]
-
-  @@unique([userId, participantId])
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_agent_voice_print {
+  id          String    @id @db.VarChar(32)
+  agent_id    String    @db.VarChar(32)
+  source_name String    @db.VarChar(50)
+  introduce   String?   @db.VarChar(200)
+  create_date DateTime? @db.DateTime(0)
+  creator     BigInt?
+  update_date DateTime? @db.DateTime(0)
+  updater     BigInt?
+  audio_id    String    @db.VarChar(32)
 }
 
-model Message {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(name: "message", fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  chats     Chat[]
-  content   String
-  createdAt DateTime @default(now())
-  read      Boolean  @default(false)
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_device {
+  id                String    @id @db.VarChar(32)
+  user_id           BigInt?
+  mac_address       String?   @db.VarChar(50)
+  last_connected_at DateTime? @db.DateTime(0)
+  auto_update       Int?      @default(0) @db.UnsignedTinyInt
+  board             String?   @db.VarChar(50)
+  alias             String?   @db.VarChar(64)
+  agent_id          String?   @db.VarChar(32)
+  app_version       String?   @db.VarChar(20)
+  sort              Int?      @default(0) @db.UnsignedInt
+  creator           BigInt?
+  create_date       DateTime? @db.DateTime(0)
+  updater           BigInt?
+  update_date       DateTime? @db.DateTime(0)
+
+  @@index([mac_address], map: "idx_ai_device_created_at")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_model_config {
+  id          String    @id @db.VarChar(32)
+  model_type  String?   @db.VarChar(20)
+  model_code  String?   @db.VarChar(50)
+  model_name  String?   @db.VarChar(50)
+  is_default  Boolean?  @default(false)
+  is_enabled  Boolean?  @default(false)
+  config_json Json?
+  doc_link    String?   @db.VarChar(200)
+  remark      String?   @db.Text
+  sort        Int?      @default(0) @db.UnsignedInt
+  creator     BigInt?
+  create_date DateTime? @db.DateTime(0)
+  updater     BigInt?
+  update_date DateTime? @db.DateTime(0)
+
+  @@index([model_type], map: "idx_ai_model_config_model_type")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_model_provider {
+  id            String    @id @db.VarChar(32)
+  model_type    String?   @db.VarChar(20)
+  provider_code String?   @db.VarChar(50)
+  name          String?   @db.VarChar(50)
+  fields        Json?
+  sort          Int?      @default(0) @db.UnsignedInt
+  creator       BigInt?
+  create_date   DateTime? @db.DateTime(0)
+  updater       BigInt?
+  update_date   DateTime? @db.DateTime(0)
+
+  @@index([model_type], map: "idx_ai_model_provider_model_type")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_ota {
+  id            String    @id @db.VarChar(32)
+  firmware_name String?   @db.VarChar(100)
+  type          String?   @db.VarChar(50)
+  version       String?   @db.VarChar(50)
+  size          BigInt?
+  remark        String?   @db.VarChar(500)
+  firmware_path String?   @db.VarChar(255)
+  sort          Int?      @default(0) @db.UnsignedInt
+  updater       BigInt?
+  update_date   DateTime? @db.DateTime(0)
+  creator       BigInt?
+  create_date   DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_tts_voice {
+  id              String    @id @db.VarChar(32)
+  tts_model_id    String?   @db.VarChar(32)
+  name            String?   @db.VarChar(20)
+  tts_voice       String?   @db.VarChar(50)
+  languages       String?   @db.VarChar(50)
+  voice_demo      String?   @db.VarChar(500)
+  remark          String?   @db.VarChar(255)
+  reference_audio String?   @db.VarChar(500)
+  reference_text  String?   @db.VarChar(500)
+  sort            Int?      @default(0) @db.UnsignedInt
+  creator         BigInt?
+  create_date     DateTime? @db.DateTime(0)
+  updater         BigInt?
+  update_date     DateTime? @db.DateTime(0)
+
+  @@index([tts_model_id], map: "idx_ai_tts_voice_tts_model_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ai_voiceprint {
+  id          String    @id @db.VarChar(32)
+  name        String?   @db.VarChar(64)
+  user_id     BigInt?
+  agent_id    String?   @db.VarChar(32)
+  agent_code  String?   @db.VarChar(36)
+  agent_name  String?   @db.VarChar(36)
+  description String?   @db.VarChar(255)
+  embedding   String?   @db.LongText
+  memory      String?   @db.Text
+  sort        Int?      @default(0) @db.UnsignedInt
+  creator     BigInt?
+  created_at  DateTime? @db.DateTime(0)
+  updater     BigInt?
+  updated_at  DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sys_dict_data {
+  id           BigInt    @id
+  dict_type_id BigInt
+  dict_label   String    @db.VarChar(255)
+  dict_value   String?   @db.VarChar(255)
+  remark       String?   @db.VarChar(255)
+  sort         Int?      @db.UnsignedInt
+  creator      BigInt?
+  create_date  DateTime? @db.DateTime(0)
+  updater      BigInt?
+  update_date  DateTime? @db.DateTime(0)
+
+  @@unique([dict_type_id, dict_value], map: "uk_dict_type_value")
+  @@index([sort], map: "idx_sort")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sys_dict_type {
+  id          BigInt    @id
+  dict_type   String    @unique(map: "dict_type") @db.VarChar(100)
+  dict_name   String    @db.VarChar(255)
+  remark      String?   @db.VarChar(255)
+  sort        Int?      @db.UnsignedInt
+  creator     BigInt?
+  create_date DateTime? @db.DateTime(0)
+  updater     BigInt?
+  update_date DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sys_params {
+  id          BigInt    @id
+  param_code  String?   @unique(map: "uk_param_code") @db.VarChar(100)
+  param_value String?   @db.VarChar(2000)
+  value_type  String?   @default("string") @db.VarChar(20)
+  param_type  Int?      @default(1) @db.UnsignedTinyInt
+  remark      String?   @db.VarChar(200)
+  creator     BigInt?
+  create_date DateTime? @db.DateTime(0)
+  updater     BigInt?
+  update_date DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sys_user {
+  id          BigInt    @id
+  username    String    @unique(map: "uk_username") @db.VarChar(50)
+  password    String?   @db.VarChar(100)
+  super_admin Int?      @db.UnsignedTinyInt
+  status      Int?      @db.TinyInt
+  create_date DateTime? @db.DateTime(0)
+  updater     BigInt?
+  creator     BigInt?
+  update_date DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sys_user_token {
+  id          BigInt    @id
+  user_id     BigInt    @unique(map: "user_id")
+  token       String    @unique(map: "token") @db.VarChar(100)
+  expire_date DateTime? @db.DateTime(0)
+  update_date DateTime? @db.DateTime(0)
+  create_date DateTime? @db.DateTime(0)
 }

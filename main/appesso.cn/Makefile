@@ -15,4 +15,4 @@ deploy:
 	fi"
 	scp api/.env.production $(PROD_USER)@$(PROD_SERVER):$(PROD_PATH)/api/.env
 	scp website/.env.production $(PROD_USER)@$(PROD_SERVER):$(PROD_PATH)/website/.env
-	ssh $(PROD_USER)@$(PROD_SERVER) "cd $(PROD_PATH) && docker-compose -f docker-compose.prod.yml up -d --build" 
+	ssh $(PROD_USER)@$(PROD_SERVER) "cd $(PROD_PATH) && docker-compose -f docker-compose.prod.yml up -d --build"

@@ -1,24 +1,9 @@
 services:
-  db:
-    image: postgres:14-alpine
-    restart: always
-    env_file:
-      - ./api/.env
-    ports:
-      # Expose postgres port for local debugging if needed
-      - "5432:5432"
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    networks:
-      - appesso-network
-
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
     restart: always
-    depends_on:
-      - db
     env_file:
       - ./api/.env
     ports:

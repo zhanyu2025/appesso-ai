@@ -1,6 +1,6 @@
 # Docker安装全模块
 
-version: '3'
+version: "3"
 services:
   # Server模块
   xiaozhi-esp32-server:
@@ -58,7 +58,7 @@ services:
     image: mysql:latest
     container_name: xiaozhi-esp32-server-db
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 45s
       interval: 10s
       retries: 10
@@ -67,6 +67,8 @@ services:
       - default
     expose:
       - 3306
+    ports:
+      - "3306:3306"
     volumes:
       - ./mysql/data:/var/lib/mysql
     environment:
