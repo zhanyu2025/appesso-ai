@@ -1,18 +1,14 @@
 import { useState, useEffect, useCallback, Fragment } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useInfiniteQuery } from 'react-query';
+import { useQuery } from 'react-query';
 
 import Fab from '../components/Fab';
 import PageHeader from '../components/PageHeader';
-import Spinner from '../components/Spinner';
-import Post from '../components/Posts/Post';
-import Repost from '../components/Posts/Repost';
+import Role from '../components/Roles/Role';
 import ComposePost from '../components/Posts/ComposePost';
 
 import usePageTitle from '../hooks/usePageTitle';
 import useScrollToTop from '../hooks/useScrollToTop';
-import useInView from '../hooks/useInView';
-import { useAuth } from '../contexts/auth-context';
 
 import axios from '../utils/axios';
 
@@ -20,47 +16,20 @@ const Home = () => {
   useScrollToTop();
   const { setPageTitle } = usePageTitle('首页 / 猿星球');
   const [modalOpen, setModalOpen] = useState(false);
-  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { inView: lastPostInView, ref } = useInView({
-    threshold: 0.2,
-  });
-
-  const { data, isLoading, isError, fetchNextPage, hasNextPage } =
-    useInfiniteQuery(
-      ['posts', 'feed', user.id],
-      async ({ pageParam = 1 }) => {
-        try {
-          const response = await axios.get(`/api/feed/home`, {
-            params: {
-              page: pageParam,
-              limit: 5,
-            },
-          });
-          return response.data;
-        } catch (error) {
-          return error;
-        }
-      },
-      {
-        getNextPageParam: (lastPage) => {
-          const { nextPage } = lastPage.info;
-          if (nextPage) return nextPage;
-          return false;
-        },
-      }
-    );
-
-  useEffect(() => {
-    if (lastPostInView && hasNextPage) {
-      fetchNextPage();
+  const [selectedRole, setSelectedRole] = useState(null);
+  const { data, isLoading } = useQuery(['roles'], async () => {
+    try {
+      const response = await axios.get(`/api/roles`);
+      return response.data;
+    } catch (error) {
+      return error;
     }
-  }, [lastPostInView, hasNextPage, fetchNextPage]);
-
+  });
   const openModal = useCallback(() => {
     setModalOpen(true);
-    navigate('/compose/post', {
+    navigate('/sign-in', {
       state: {
         backgroundLocation: location,
       },
@@ -76,19 +45,10 @@ const Home = () => {
   }, [location.pathname, setPageTitle]);
 
   useEffect(() => {
-    if (location.state?.from?.pathname === '/compose/post') {
+    if (location.state?.from?.pathname === '/sign-in') {
       openModal();
     }
   }, [openModal, location.state?.from?.pathname]);
-
-  if (isLoading)
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        <Spinner />
-      </div>
-    );
-
-  if (isError) return <div>出现了错误，请稍后再试。</div>;
 
   return (
     <div
@@ -99,36 +59,19 @@ const Home = () => {
       <div className="sticky top-0 left-0 w-full z-[100]">
         <PageHeader title="首页" />
       </div>
-      <div className="border-b border-on-surface/30">
-        <ComposePost />
-      </div>
-      <div className="mt-1 mb-14 pb-20">
-        {data.pages[0].info.total === 0 && (
-          <div className="mt-2">
-            <h1 className="text-lg text-on-surface font-bold text-center px-20">
-              你关注的人发布的内容将显示在这里。
-            </h1>
-          </div>
-        )}
-        {data.pages.map((group, i) => {
+      <div className="mt-1 mb-14 pb-20 flex flex-col gap-6 mx-4">
+        {data?.map((role) => {
           return (
-            // eslint-disable-next-line react/no-array-index-key
-            <Fragment key={i}>
-              {group.results.map((post) =>
-                post.post ? (
-                  <Repost key={`${post.id}${post.post.id}`} repost={post} />
-                ) : (
-                  <Post post={post} key={post.id} />
-                )
-              )}
+            <Fragment key={role.id}>
+              <Role
+                role={role}
+                key={role.id}
+                isSelected={selectedRole === role.id}
+                onSelect={(id) => setSelectedRole(id)}
+              />
             </Fragment>
           );
         })}
-        {hasNextPage && (
-          <div ref={ref} className="h-2 text-center">
-            <Spinner />
-          </div>
-        )}
       </div>
       <div className="fixed right-10 bottom-20 z-50">
         <Fab label="发布" onClick={openModal} />

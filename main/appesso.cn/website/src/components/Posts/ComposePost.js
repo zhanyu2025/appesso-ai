@@ -85,7 +85,7 @@ const ComposePost = () => {
         <div className="h-10 w-10 overflow-hidden">
           <img
             className="h-full w-full rounded-full object-cover"
-            src={user.profile.img}
+            src={user.username}
             alt="user avatar"
           />
         </div>

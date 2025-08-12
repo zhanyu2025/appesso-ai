@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 
 const authRoutes = require('./routes/auth');
-const postRoutes = require('./routes/post');
+const rolesRoutes = require('./routes/role');
 const usersRoutes = require('./routes/user');
 const feedRoutes = require('./routes/feed');
 const notificationRoutes = require('./routes/notification');
@@ -65,7 +65,7 @@ if (!isDev) {
 }
 
 app.use('/api/auth', authRoutes);
-app.use('/api/post', postRoutes);
+app.use('/api/roles', rolesRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/feed', feedRoutes);
 app.use('/api/notification', notificationRoutes);

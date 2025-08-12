@@ -1,15 +1,16 @@
-const jwt = require('jsonwebtoken');
-
+const crypto = require('crypto');
 const prisma = require('../services/connect-db');
 
-const generateJWT = (userId, secret, expiresIn) =>
-  jwt.sign(
-    {
-      userId,
-    },
-    secret,
-    { expiresIn }
-  );
+/**
+ * Generates an MD5 hash of the user ID to be used as a token.
+ * This replaces the previous JWT implementation to ensure a fixed length.
+ * @param {string | number | BigInt} userId The user's ID.
+ * @returns {string} The MD5 hash of the user ID.
+ */
+const generateJWT = (userId) => {
+  const param = String(userId);
+  return crypto.createHash('md5').update(param).digest('hex');
+};
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -21,18 +22,18 @@ const COOKIE_OPTIONS = {
 
 const clearTokens = async (req, res, next) => {
   const { signedCookies = {} } = req;
-  const { refreshToken } = signedCookies;
-  if (refreshToken) {
+  const { accessToken } = signedCookies;
+  if (accessToken) {
     try {
-      const token = await prisma.session.findUnique({
+      const token = await prisma.sys_user_token.findUnique({
         where: {
-          refreshToken,
+          token: accessToken,
         },
       });
       if (token) {
-        await prisma.session.delete({
+        await prisma.sys_user_token.delete({
           where: {
-            refreshToken,
+            token: accessToken,
           },
         });
       }
@@ -40,7 +41,7 @@ const clearTokens = async (req, res, next) => {
       return next(error);
     }
   }
-  return res.clearCookie('refreshToken', COOKIE_OPTIONS);
+  return res.clearCookie('accessToken', COOKIE_OPTIONS);
 };
 
 module.exports = { generateJWT, COOKIE_OPTIONS, clearTokens };

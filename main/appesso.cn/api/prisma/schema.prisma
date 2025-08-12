@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "./"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
 }
 
 datasource db {
@@ -74,6 +74,7 @@ model ai_agent_chat_history {
   id          BigInt   @id @default(autoincrement())
   mac_address String?  @db.VarChar(50)
   agent_id    String?  @db.VarChar(32)
+  role_id     String?  @db.VarChar(32)
   session_id  String?  @db.VarChar(50)
   chat_type   Int?     @db.TinyInt
   content     String?  @db.VarChar(1024)
@@ -81,6 +82,7 @@ model ai_agent_chat_history {
   created_at  DateTime @default(now())
   updated_at  DateTime @default(now())
 
+  @@index([role_id], map: "idx_ai_agent_chat_history_role_id")
   @@index([agent_id], map: "idx_ai_agent_chat_history_agent_id")
   @@index([agent_id, session_id, created_at], map: "idx_ai_agent_chat_history_agent_session_created")
   @@index([mac_address], map: "idx_ai_agent_chat_history_mac")
@@ -291,15 +293,16 @@ model sys_params {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model sys_user {
-  id          BigInt    @id
-  username    String    @unique(map: "uk_username") @db.VarChar(50)
-  password    String?   @db.VarChar(100)
-  super_admin Int?      @db.UnsignedTinyInt
-  status      Int?      @db.TinyInt
-  create_date DateTime? @db.DateTime(0)
-  updater     BigInt?
-  creator     BigInt?
-  update_date DateTime? @db.DateTime(0)
+  id              BigInt           @id
+  username        String           @unique(map: "uk_username") @db.VarChar(50)
+  password        String?          @db.VarChar(100)
+  super_admin     Int?             @db.UnsignedTinyInt
+  status          Int?             @db.TinyInt
+  create_date     DateTime?        @db.DateTime(0)
+  updater         BigInt?
+  creator         BigInt?
+  update_date     DateTime?        @db.DateTime(0)
+  sys_user_tokens sys_user_token[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -310,4 +313,24 @@ model sys_user_token {
   expire_date DateTime? @db.DateTime(0)
   update_date DateTime? @db.DateTime(0)
   create_date DateTime? @db.DateTime(0)
+  sys_user    sys_user? @relation(fields: [user_id], references: [id])
+}
+
+model ai_role {
+  id            String    @id @db.VarChar(32)
+  agent_id      String    @db.VarChar(32)
+  name          String    @db.VarChar(64)
+  tts_model_id  String    @db.VarChar(32)
+  tts_voice_id  String    @db.VarChar(32)
+  system_prompt String    @db.Text
+  create_date   DateTime  @db.DateTime(0)
+  update_date   DateTime? @db.DateTime(0)
+}
+
+model ai_device_role {
+  id          String    @id @db.VarChar(32)
+  role_id     String    @db.VarChar(32)
+  device_id   String    @db.VarChar(32)
+  create_date DateTime  @db.DateTime(0)
+  update_date DateTime? @db.DateTime(0)
 }

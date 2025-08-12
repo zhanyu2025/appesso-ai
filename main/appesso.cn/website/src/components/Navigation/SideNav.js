@@ -21,7 +21,6 @@ import {
 import toast from 'react-hot-toast';
 
 import { useAuth } from '../../contexts/auth-context';
-import useNotifications from '../../hooks/useNotifications';
 
 import DropDown from './DropDown/DropDown';
 import DropDownItem from './DropDown/DropDownItem';
@@ -36,7 +35,6 @@ const SideNav = () => {
   const queryClient = useQueryClient();
 
   const { user, logout } = useAuth();
-  const notificationData = useNotifications();
 
   const logoutMutation = useMutation(
     () => {
@@ -210,18 +208,6 @@ const SideNav = () => {
                     >
                       通知
                     </span>
-                    {notificationData.isSuccess &&
-                      notificationData.data.pages[0].info.unReadNotifications >
-                        0 && (
-                        <span className="absolute top-1 left-8 w-5 h-5 rounded-full bg-primary flex items-center justify-center text-xs">
-                          <span>
-                            {
-                              notificationData.data.pages[0].info
-                                .unReadNotifications
-                            }
-                          </span>
-                        </span>
-                      )}
                   </div>
                 )}
               </NavLink>
@@ -312,13 +298,13 @@ const SideNav = () => {
         >
           <img
             className="h-full w-full rounded-full object-cover"
-            src={user.profile.img}
+            src={user.username}
             alt="avatar"
           />
         </div>
         <div className="flex justify-between flex-1 items-center sm:hidden lg:flex">
           <div>
-            <p className="font-semibold">{user.profile.name}</p>
+            <p className="font-semibold">{user.username}</p>
             <p className="text-sm text-on-surface/70 -mt-1">@{user.username}</p>
           </div>
           <button
@@ -340,13 +326,13 @@ const SideNav = () => {
                 <div className="h-10 w-10 overflow-hidden">
                   <img
                     className="h-full w-full rounded-full object-cover"
-                    src={user.profile.img}
+                    src={user.username}
                     alt="avatar"
                   />
                 </div>
                 <div className="flex justify-between flex-1 items-center">
                   <div>
-                    <p className="font-semibold">{user.profile.name}</p>
+                    <p className="font-semibold">{user.username}</p>
                     <p className="text-sm text-on-surface/70 -mt-1">
                       @{user.username}
                     </p>

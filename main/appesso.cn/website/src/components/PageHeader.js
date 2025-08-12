@@ -18,7 +18,7 @@ const PageHeader = ({ title }) => {
       >
         <img
           className="h-full w-full rounded-full object-cover"
-          src={user.profile.img}
+          src={user.username}
           alt="avatar"
         />
       </button>

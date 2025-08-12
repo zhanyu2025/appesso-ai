@@ -13,10 +13,7 @@ import {
 
 import { IconContext } from 'react-icons';
 
-import useNotifications from '../../hooks/useNotifications';
-
 const BottomNav = () => {
-  const notificationData = useNotifications();
   return (
     <div className="flex bg-surface justify-between items-center px-8 h-14 border-t border-on-surface/20">
       <div className="text-on-surface">
@@ -67,14 +64,6 @@ const BottomNav = () => {
                   {isActive ? <RiNotificationFill /> : <RiNotificationLine />}
                 </IconContext.Provider>
               </span>
-              {notificationData.isSuccess &&
-                notificationData.data.pages[0].info.unReadNotifications > 0 && (
-                  <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center text-xs">
-                    <span>
-                      {notificationData.data.pages[0].info.unReadNotifications}
-                    </span>
-                  </span>
-                )}
             </div>
           )}
         </NavLink>

@@ -1,8 +1,6 @@
-# api/Dockerfile
-FROM node:18-alpine
-
-# Install OpenSSL for Prisma
-RUN apk add --no-cache openssl
+FROM node:18-slim
+RUN apt-get update
+RUN apt-get install -y openssl
 
 WORKDIR /app
 

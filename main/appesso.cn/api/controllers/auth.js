@@ -11,47 +11,23 @@ const {
   ACCESS_TOKEN_LIFE,
 } = require('../utils/config');
 
-const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10);
-
 const loginMobile = async (req, res, next) => {
   const { mobile } = req.body;
   try {
-    let user = await prisma.user.findUnique({
+    let user = await prisma.sys_user.findUnique({
       where: {
-        mobile,
-      },
-      select: {
-        id: true,
-        mobile: true,
-        username: true,
-        provider: true,
-        createdAt: true,
-        profile: true,
+        username: mobile,
       },
     });
-
     if (!user) {
-      // Create a new user if not found
-      const generatedUsername = `user_${nanoid()}`; // Generate a username
-      user = await prisma.user.create({
+      user = await prisma.sys_user.create({
         data: {
-          mobile,
-          username: generatedUsername,
-          provider: 'mobile',
-          profile: {
-            create: {
-              name: generatedUsername, // Default name from generated username
-              img: 'https://storage.googleapis.com/twitter-clone-347513.appspot.com/images/default_avatar.jpg', // Default image
-            },
-          },
+          username: mobile,
         },
         select: {
           id: true,
-          mobile: true,
           username: true,
-          provider: true,
-          createdAt: true,
-          profile: true,
+          create_date: true,
         },
       });
     }
@@ -65,35 +41,29 @@ const loginMobile = async (req, res, next) => {
 
 const verifyAndGenerateAccessToken = async (req, res, next) => {
   const { signedCookies } = req;
-  const { refreshToken } = signedCookies;
-  if (!refreshToken) {
+  const { accessToken } = signedCookies;
+  if (!accessToken) {
     return res.sendStatus(204);
   }
   try {
-    const refreshTokenInDB = await prisma.session.findFirst({
+    const token = await prisma.sys_user_token.findFirst({
       where: {
-        refreshToken,
+        token: accessToken,
       },
     });
-    if (!refreshTokenInDB) {
+    if (!token) {
       await clearTokens(req, res, next);
       const error = createError.Unauthorized();
       throw error;
     }
     try {
-      const decodedToken = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-      const { userId } = decodedToken;
-      const user = await prisma.user.findUnique({
+      const user = await prisma.sys_user.findUnique({
         where: {
-          id: userId,
+          id: token.user_id,
         },
         select: {
           id: true,
-          mobile: true,
           username: true,
-          provider: true,
-          createdAt: true,
-          profile: true,
         },
       });
       if (!user) {
@@ -107,7 +77,10 @@ const verifyAndGenerateAccessToken = async (req, res, next) => {
         ACCESS_TOKEN_LIFE
       );
       return res.status(200).json({
-        user,
+        user: {
+          ...user,
+          id: String(user.id),
+        },
         accessToken,
         expiresAt: new Date(Date.now() + ms(ACCESS_TOKEN_LIFE)),
       });

@@ -78,7 +78,7 @@ const Display = () => {
           {themes.map((t) => (
             <div
               key={t.name}
-              className="flex flex-1 py-5 px-3 gap-5 items-center cursor-pointer"
+              className="flex flex-1 py-5 rounded-xl px-3 gap-5 items-center cursor-pointer"
               style={{
                 backgroundColor: t.bgColor,
                 color: t.fgColor,
