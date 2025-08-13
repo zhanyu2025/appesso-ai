@@ -1,5 +1,7 @@
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { useQuery } from 'react-query';
+
+import dayjs from '../utils/day';
 
 import Spinner from '../components/Spinner';
 import PageHeader from '../components/PageHeader';
@@ -9,9 +11,9 @@ import usePageTitle from '../hooks/usePageTitle';
 
 const Messages = () => {
   usePageTitle('消息 / 猿星球');
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const messagesQuery = useQuery(
-    'messages',
+    ['roles'],
     async () => {
       try {
         const response = await axios.get(`/api/chat/all`);
@@ -26,83 +28,49 @@ const Messages = () => {
     }
   );
 
-  if (messagesQuery.isLoading)
+  if (messagesQuery?.isLoading)
     return (
       <div className="w-full h-full flex items-center justify-center">
         <Spinner />
       </div>
     );
 
-  if (messagesQuery.isError) return <div>出现了错误，请稍后再试。</div>;
-
+  if (messagesQuery?.isError) return <div>出现了错误，请稍后再试。</div>;
   return (
     <div className="flex sm:h-full">
       <div className="static top-0 overflow-y-auto overflow-x-hidden h-[calc(100vh_-_56px)] flex-1 sm:h-full">
         <div className="sticky top-0 left-0 w-full">
           <PageHeader title="消息" />
         </div>
-        <div>
-          {messagesQuery.data.chats.map((chat) => {
-            const latestMessage = chat.messages[chat.messages.length - 1];
-            const unReadMessages = chat.messages.reduce(
-              (acc, cur) =>
-                cur.userId !== user.id && !cur.read ? acc + 1 : acc,
-              0
-            );
+        <div className="flex flex-col mx-6">
+          {messagesQuery?.data.chats?.map((chat) => {
+            if (chat.chat_type === 1) {
+              return (
+                <div
+                  className="flex flex-col items-end gap-1 mb-5"
+                  key={chat.id}
+                >
+                  <p className="bg-primary text-on-primary text-base p-3 rounded-t-xl rounded-bl-xl max-w-[80%] break-words">
+                    {chat.content}
+                  </p>
+                  <span className="text-on-surface/80 font-light text-xs">
+                    {dayjs(chat.createdAt).format('MMM D, YYYY, hh:mm A')}
+                  </span>
+                </div>
+              );
+            }
             return (
-              <NavLink
-                to={`${chat.id}`}
-                className={({ isActive }) =>
-                  isActive
-                    ? 'flex px-4 py-2 items-center gap-1 bg-on-surface/10'
-                    : 'flex px-4 py-2 items-center gap-1'
-                }
+              <div
+                className="flex flex-col items-start gap-1 mb-5"
                 key={chat.id}
               >
-                <div className="h-10 w-10 overflow-hidden">
-                  <img
-                    className="h-full w-full rounded-full object-cover"
-                    src={chat.participant.profile.img}
-                    alt="avatar"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex justify-between">
-                    <div className="flex gap-1 items-center">
-                      <h3 className="font-bold text-on-surface">
-                        {chat.participant.profile.name}
-                      </h3>
-                      <span className="text-on-surface/70 font-semibold text-sm">
-                        @{chat.participant.username}
-                      </span>
-                    </div>
-                    <span className="text-on-surface/70">1天前</span>
-                  </div>
-                  <div className="flex justify-between">
-                    {latestMessage?.userId === user.id ? (
-                      <p className="text-on-surface/80 font-medium empty:after:content-['']  empty:inline-block">
-                        {latestMessage?.content &&
-                          `你: ${latestMessage?.content}`}
-                      </p>
-                    ) : (
-                      <p
-                        className={`text-on-surface/80 ${
-                          latestMessage?.read ? 'font-medium' : 'font-semibold'
-                        }  empty:after:content-[''] empty:after:inline-block`}
-                      >
-                        {latestMessage?.content}
-                      </p>
-                    )}
-                    {unReadMessages > 0 && (
-                      <div className="bg-primary w-5 h-5 flex items-center justify-center p-3 rounded-full">
-                        <span className="text-on-primary text-xs font-semibold">
-                          {unReadMessages}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </NavLink>
+                <p className="bg-on-surface/30 text-on-surface text-base p-3 rounded-t-xl rounded-br-xl max-w-[80%] break-words">
+                  {chat.content}
+                </p>
+                <span className="text-on-surface/80 font-light text-xs">
+                  {dayjs(chat.createdAt).format('MMM D, YYYY, hh:mm A')}
+                </span>
+              </div>
             );
           })}
         </div>

@@ -4,28 +4,19 @@ const prisma = require('../services/connect-db');
 
 const getAllChatsOfUser = async (req, res, next) => {
   const { userId } = req;
+  const agent = await prisma.ai_agent.findFirst({
+    where: {
+      user_id: BigInt(userId),
+    },
+  });
+  if (!agent) return res.status(404).json({ message: '角色不存在' });
   try {
-    const chats = await prisma.chat.findMany({
+    const chats = await prisma.ai_agent_chat_history.findMany({
       where: {
-        userId,
+        agent_id: agent.id,
       },
-      include: {
-        participant: {
-          select: {
-            username: true,
-            profile: {
-              select: {
-                name: true,
-                img: true,
-              },
-            },
-          },
-        },
-        messages: {
-          orderBy: {
-            createdAt: 'asc',
-          },
-        },
+      orderBy: {
+        created_at: 'asc',
       },
     });
     return res.status(200).json({ chats });

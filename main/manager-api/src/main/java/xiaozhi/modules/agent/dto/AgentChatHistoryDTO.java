@@ -25,4 +25,7 @@ public class AgentChatHistoryDTO {
 
     @Schema(description = "MAC地址")
     private String macAddress;
+
+    @Schema(description = "角色ID")
+    private String roleId;
 }

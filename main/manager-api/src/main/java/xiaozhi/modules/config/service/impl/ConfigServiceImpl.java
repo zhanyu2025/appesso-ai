@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+
+
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import lombok.AllArgsConstructor;
 import xiaozhi.common.constant.Constant;
 import xiaozhi.common.exception.ErrorCode;
 import xiaozhi.common.exception.RenException;
@@ -31,27 +34,45 @@ import xiaozhi.modules.agent.service.AgentTemplateService;
 import xiaozhi.modules.agent.vo.AgentVoicePrintVO;
 import xiaozhi.modules.config.service.ConfigService;
 import xiaozhi.modules.device.entity.DeviceEntity;
+import xiaozhi.modules.device.entity.DeviceRoleEntity;
+import xiaozhi.modules.device.service.IDeviceRoleService;
 import xiaozhi.modules.device.service.DeviceService;
 import xiaozhi.modules.model.entity.ModelConfigEntity;
 import xiaozhi.modules.model.service.ModelConfigService;
+import xiaozhi.modules.role.entity.RoleEntity;
+import xiaozhi.modules.role.service.IRoleService;
 import xiaozhi.modules.sys.dto.SysParamsDTO;
 import xiaozhi.modules.sys.service.SysParamsService;
 import xiaozhi.modules.timbre.service.TimbreService;
 import xiaozhi.modules.timbre.vo.TimbreDetailsVO;
 
 @Service
-@AllArgsConstructor
+// @AllArgsConstructor // 移除此行
 public class ConfigServiceImpl implements ConfigService {
-    private final SysParamsService sysParamsService;
-    private final DeviceService deviceService;
-    private final ModelConfigService modelConfigService;
-    private final AgentService agentService;
-    private final AgentTemplateService agentTemplateService;
-    private final RedisUtils redisUtils;
-    private final TimbreService timbreService;
-    private final AgentPluginMappingService agentPluginMappingService;
-    private final AgentMcpAccessPointService agentMcpAccessPointService;
-    private final AgentVoicePrintDao agentVoicePrintDao;
+    @Autowired // 添加 Autowired
+    private SysParamsService sysParamsService;
+    @Autowired // 添加 Autowired
+    private DeviceService deviceService;
+    @Autowired // 添加 Autowired
+    private ModelConfigService modelConfigService;
+    @Autowired // 添加 Autowired
+    private AgentService agentService;
+    @Autowired // 添加 Autowired
+    private AgentTemplateService agentTemplateService;
+    @Autowired // 添加 Autowired
+    private RedisUtils redisUtils;
+    @Autowired // 添加 Autowired
+    private TimbreService timbreService;
+    @Autowired // 添加 Autowired
+    private AgentPluginMappingService agentPluginMappingService;
+    @Autowired
+    private AgentMcpAccessPointService agentMcpAccessPointService;
+    @Autowired
+    private IDeviceRoleService deviceRoleService; // 注入 IDeviceRoleService
+    @Autowired
+    private IRoleService roleService; // 注入 IRoleService
+    @Autowired // 添加 Autowired
+    private AgentVoicePrintDao agentVoicePrintDao;
 
     @Override
     public Object getConfig(Boolean isCache) {
@@ -115,16 +136,41 @@ public class ConfigServiceImpl implements ConfigService {
         if (agent == null) {
             throw new RenException("智能体未找到");
         }
-        // 获取音色信息
-        String voice = null;
+
+        // --- 新增逻辑：通过 device 找到绑定的角色 role，并获取 system_prompt, tts_model_id, tts_voice_id ---
+        String systemPrompt = agent.getSystemPrompt();
+        String ttsModelId = agent.getTtsModelId();
+        String ttsVoice = null;
         String referenceAudio = null;
         String referenceText = null;
-        TimbreDetailsVO timbre = timbreService.get(agent.getTtsVoiceId());
-        if (timbre != null) {
-            voice = timbre.getTtsVoice();
-            referenceAudio = timbre.getReferenceAudio();
-            referenceText = timbre.getReferenceText();
+
+        // 根据 deviceId 获取 device_role 信息
+        DeviceRoleEntity deviceRole = deviceRoleService.getDeviceRoleByDeviceId(device.getId());
+        if (deviceRole != null) {
+            // 根据 roleId 获取 role 信息
+            RoleEntity role = roleService.getRoleById(deviceRole.getRoleId());
+            if (role != null) {
+                systemPrompt = role.getSystemPrompt();
+                ttsModelId = role.getTtsModelId();
+                // 获取音色信息 (根据 role 的 ttsVoiceId)
+                TimbreDetailsVO timbre = timbreService.get(role.getTtsVoiceId());
+                if (timbre != null) {
+                    ttsVoice = timbre.getTtsVoice();
+                    referenceAudio = timbre.getReferenceAudio();
+                    referenceText = timbre.getReferenceText();
+                }
+            }
+        } else {
+            // 如果没有找到 device_role，则继续使用 agent 的 ttsVoiceId 获取音色信息
+            TimbreDetailsVO timbre = timbreService.get(agent.getTtsVoiceId());
+            if (timbre != null) {
+                ttsVoice = timbre.getTtsVoice();
+                referenceAudio = timbre.getReferenceAudio();
+                referenceText = timbre.getReferenceText();
+            }
         }
+        // --- 新增逻辑结束 ---
+
         // 构建返回数据
         Map<String, Object> result = new HashMap<>();
         // 获取单台设备每天最多输出字数
@@ -173,29 +219,32 @@ public class ConfigServiceImpl implements ConfigService {
         buildVoiceprintConfig(agent.getId(), result);
 
         // 构建模块配置
+        // 构建模块配置
         buildModuleConfig(
                 agent.getAgentName(),
-                agent.getSystemPrompt(),
+                systemPrompt, // 使用从 role 或 agent 获取的 systemPrompt
                 agent.getSummaryMemory(),
-                voice,
+                ttsVoice, // 使用从 role 或 agent 获取的 ttsVoice
                 referenceAudio,
                 referenceText,
                 agent.getVadModelId(),
                 agent.getAsrModelId(),
-                agent.getLlmModelId(),
+                agent.getLlmModelId(), // 确保这个是 agent 的 llmModelId
                 agent.getVllmModelId(),
-                agent.getTtsModelId(),
+                ttsModelId, // 这个是我们从 role 获得的 ttsModelId
                 agent.getMemModelId(),
                 agent.getIntentModelId(),
                 result,
-                true);
+                true); // isCache
+
+        System.out.println("ttsModelId: " + ttsModelId); // 添加打印语句
 
         return result;
     }
 
     /**
      * 构建配置信息
-     * 
+     *
      * @param config 系统参数列表
      * @return 配置信息
      */
@@ -266,7 +315,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     /**
      * 构建声纹配置信息
-     * 
+     *
      * @param agentId 智能体ID
      * @param result  结果Map
      */
@@ -308,7 +357,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     /**
      * 获取智能体关联的声纹信息
-     * 
+     *
      * @param agentId 智能体ID
      * @return 声纹信息列表
      */
@@ -322,7 +371,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     /**
      * 构建模块配置
-     * 
+     *
      * @param prompt         提示词
      * @param voice          音色
      * @param referenceAudio 参考音频路径

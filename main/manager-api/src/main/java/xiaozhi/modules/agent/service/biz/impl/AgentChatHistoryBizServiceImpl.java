@@ -21,6 +21,8 @@ import xiaozhi.modules.agent.service.AgentService;
 import xiaozhi.modules.agent.service.biz.AgentChatHistoryBizService;
 import xiaozhi.modules.device.entity.DeviceEntity;
 import xiaozhi.modules.device.service.DeviceService;
+import xiaozhi.modules.device.service.IDeviceRoleService;
+import xiaozhi.modules.device.entity.DeviceRoleEntity;
 
 /**
  * {@link AgentChatHistoryBizService} impl
@@ -38,6 +40,7 @@ public class AgentChatHistoryBizServiceImpl implements AgentChatHistoryBizServic
     private final AgentChatAudioService agentChatAudioService;
     private final RedisUtils redisUtils;
     private final DeviceService deviceService;
+    private final IDeviceRoleService ideviceRoleService;
 
     /**
      * 处理聊天记录上报，包括文件上传和相关信息记录
@@ -62,23 +65,26 @@ public class AgentChatHistoryBizServiceImpl implements AgentChatHistoryBizServic
         Integer chatHistoryConf = agentEntity.getChatHistoryConf();
         String agentId = agentEntity.getId();
 
+        // 获取设备信息和deviceId
+        DeviceEntity device = deviceService.getDeviceByMacAddress(macAddress);
+        String deviceId = null;
+        if (device != null) {
+            deviceId = device.getId();
+            // 更新设备最后连接时间
+            deviceService.updateDeviceConnectionInfo(agentId, deviceId, null);
+        } else {
+            log.warn("聊天记录上报时，未找到mac地址为 {} 的设备", macAddress);
+        }
+
         if (Objects.equals(chatHistoryConf, Constant.ChatHistoryConfEnum.RECORD_TEXT.getCode())) {
-            saveChatText(report, agentId, macAddress, null, reportTimeMillis);
+            saveChatText(report, agentId, macAddress, deviceId, null, reportTimeMillis);
         } else if (Objects.equals(chatHistoryConf, Constant.ChatHistoryConfEnum.RECORD_TEXT_AUDIO.getCode())) {
             String audioId = saveChatAudio(report);
-            saveChatText(report, agentId, macAddress, audioId, reportTimeMillis);
+            saveChatText(report, agentId, macAddress, deviceId, audioId, reportTimeMillis);
         }
 
         // 更新设备最后对话时间
         redisUtils.set(RedisKeys.getAgentDeviceLastConnectedAtById(agentId), new Date());
-
-        // 更新设备最后连接时间
-        DeviceEntity device = deviceService.getDeviceByMacAddress(macAddress);
-        if (device != null) {
-            deviceService.updateDeviceConnectionInfo(agentId, device.getId(), null);
-        } else {
-            log.warn("聊天记录上报时，未找到mac地址为 {} 的设备", macAddress);
-        }
 
         return Boolean.TRUE;
     }
@@ -105,11 +111,20 @@ public class AgentChatHistoryBizServiceImpl implements AgentChatHistoryBizServic
     /**
      * 组装上报数据
      */
-    private void saveChatText(AgentChatHistoryReportDTO report, String agentId, String macAddress, String audioId, Long reportTime) {
+    private void saveChatText(AgentChatHistoryReportDTO report, String agentId, String macAddress, String deviceId, String audioId, Long reportTime) {
         // 构建聊天记录实体
+        String roleId = null;
+        if (deviceId != null) {
+            DeviceRoleEntity deviceRole = ideviceRoleService.getDeviceRoleByDeviceId(deviceId);
+            if (deviceRole != null) {
+                roleId = deviceRole.getRoleId();
+            }
+        }
+
         AgentChatHistoryEntity entity = AgentChatHistoryEntity.builder()
                 .macAddress(macAddress)
                 .agentId(agentId)
+                .roleId(roleId) // 添加 roleId
                 .sessionId(report.getSessionId())
                 .chatType(report.getChatType())
                 .content(report.getContent())
