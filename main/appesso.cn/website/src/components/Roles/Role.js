@@ -3,12 +3,15 @@ import PropTypes from 'prop-types';
 import RadioButton from '../RadioButton';
 import { useTheme } from '../../contexts/theme-context';
 
-const Role = ({ role, onSelect, isSelected }) => {
+const Role = ({ role, devices, onSelect }) => {
   const { primaryColor, theme } = useTheme();
+  const isSelected = devices?.some((device) =>
+    device?.roles?.some((item) => item.role_id === role.id)
+  );
   return (
     <div
       key={role.id}
-      className="flex flex-1 py-5 rounded-xl px-3 gap-5 items-center justify-between cursor-pointer"
+      className="flex flex-1 py-5 rounded-xl px-3 gap-5 items-center justify-between cursor-pointer disabled:cursor-not-allowed"
       role="button"
       tabIndex={0}
       style={{
@@ -16,7 +19,8 @@ const Role = ({ role, onSelect, isSelected }) => {
         color: theme.fgColor,
         border: `2px solid ${isSelected ? primaryColor.color : 'white'}`,
       }}
-      onClick={() => onSelect(role.id)}
+      onClick={() => (isSelected ? null : onSelect(role.id))}
+      disabled={isSelected}
       onKeyDown={(e) => e.key !== 'Tab' && onSelect(role.id)}
     >
       <div className="flex flex-col gap-2">
@@ -30,11 +34,14 @@ const Role = ({ role, onSelect, isSelected }) => {
             fgColor="#fff"
             selected={isSelected}
             size="20px"
+            disabled={isSelected}
             borderColor={isSelected ? 'transparent' : `${theme.fgColor}4d`}
-            radioBtnChangeHandler={() => onSelect(role.id)}
+            radioBtnChangeHandler={() =>
+              isSelected ? null : onSelect(role.id)
+            }
           />
         </div>
-        <p className="text-xs text-black/20 dark:text-white/25">
+        <p className="text-sm text-white/25 text-pretty line-clamp-3">
           {role.system_prompt}
         </p>
       </div>
@@ -52,11 +59,27 @@ Role.propTypes = {
     create_date: PropTypes.string,
   }).isRequired,
   onSelect: PropTypes.func,
-  isSelected: PropTypes.bool,
+  devices: PropTypes.arrayOf(
+    PropTypes.shape({
+      agent_id: PropTypes.string,
+      alias: PropTypes.string,
+      board: PropTypes.string,
+      user_id: PropTypes.string,
+      create_date: PropTypes.string,
+      roles: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string,
+          role_id: PropTypes.string,
+          device_id: PropTypes.string,
+          create_date: PropTypes.string,
+        })
+      ),
+    })
+  ).isRequired,
 };
 
 Role.defaultProps = {
-  isSelected: false,
-  onSelect: (id) => {},
+  onSelect: () => {},
 };
+
 export default Role;

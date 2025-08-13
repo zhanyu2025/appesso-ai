@@ -1,16 +1,13 @@
-import { useState, useEffect, useCallback, Fragment } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useQuery } from 'react-query';
 
 import Fab from '../components/Fab';
 import PageHeader from '../components/PageHeader';
-import Role from '../components/Roles/Role';
-import ComposePost from '../components/Posts/ComposePost';
 
 import usePageTitle from '../hooks/usePageTitle';
 import useScrollToTop from '../hooks/useScrollToTop';
 
-import axios from '../utils/axios';
+import Roles from '../components/Roles/Roles';
 
 const Home = () => {
   useScrollToTop();
@@ -18,18 +15,10 @@ const Home = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedRole, setSelectedRole] = useState(null);
-  const { data, isLoading } = useQuery(['roles'], async () => {
-    try {
-      const response = await axios.get(`/api/roles`);
-      return response.data;
-    } catch (error) {
-      return error;
-    }
-  });
+
   const openModal = useCallback(() => {
     setModalOpen(true);
-    navigate('/sign-in', {
+    navigate('/signin', {
       state: {
         backgroundLocation: location,
       },
@@ -45,7 +34,7 @@ const Home = () => {
   }, [location.pathname, setPageTitle]);
 
   useEffect(() => {
-    if (location.state?.from?.pathname === '/sign-in') {
+    if (location.state?.from?.pathname === '/signin') {
       openModal();
     }
   }, [openModal, location.state?.from?.pathname]);
@@ -59,20 +48,7 @@ const Home = () => {
       <div className="sticky top-0 left-0 w-full z-[100]">
         <PageHeader title="首页" />
       </div>
-      <div className="mt-1 mb-14 pb-20 flex flex-col gap-6 mx-4">
-        {data?.map((role) => {
-          return (
-            <Fragment key={role.id}>
-              <Role
-                role={role}
-                key={role.id}
-                isSelected={selectedRole === role.id}
-                onSelect={(id) => setSelectedRole(id)}
-              />
-            </Fragment>
-          );
-        })}
-      </div>
+      <Roles />
       <div className="fixed right-10 bottom-20 z-50">
         <Fab label="发布" onClick={openModal} />
       </div>

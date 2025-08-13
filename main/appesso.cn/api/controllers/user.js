@@ -1,3 +1,8 @@
+// eslint-disable-next-line  no-extend-native
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 const createError = require('http-errors');
 
 const prisma = require('../services/connect-db');
@@ -176,6 +181,33 @@ const getPostsByUser = async (req, res, next) => {
       },
       results: slicedPosts,
     });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const getMyDevices = async (req, res, next) => {
+  const { userId } = req;
+  try {
+    const devices = await prisma.ai_device.findMany({
+      where: {
+        user_id: userId,
+      },
+    });
+    const deviceRoles = await prisma.ai_device_role.findMany({
+      where: {
+        device_id: {
+          in: devices.map((device) => device.id),
+        },
+      },
+    });
+    const devicesWithRoles = devices.map((device) => ({
+      ...device,
+      id: String(device.id),
+      user_id: String(device.user_id),
+      roles: deviceRoles.filter((role) => role.device_id === device.id),
+    }));
+    return res.status(200).json(devicesWithRoles);
   } catch (error) {
     return next(error);
   }
@@ -673,6 +705,7 @@ const updateDateOfBirth = async (req, res, next) => {
 };
 
 module.exports = {
+  getMyDevices,
   getUserByUsername,
   getPostsByUser,
   getLikedPostsByUser,
