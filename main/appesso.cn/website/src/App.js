@@ -22,6 +22,7 @@ import Home from './pages/Home';
 import Signin from './pages/Signin';
 
 import UserProfile from './pages/UserProfile';
+import DeviceActivation from './pages/DeviceActivation';
 import Follow from './pages/Follow';
 import NoMatch from './pages/NoMatch';
 import PostDetail from './pages/PostDetail';
@@ -39,8 +40,9 @@ import Display from './pages/Settings/Display';
 import Layout from './components/Layout';
 import SplashScreen from './components/SplashScreen';
 import Modal from './components/Modal';
-import ComposePost from './components/Posts/ComposePost';
+import SigninForm from './components/SigninForm';
 import UserPosts from './components/Posts/UserPosts';
+import DeviceActivationForm from './components/DeviceActivationForm';
 import PostsAndReplies from './components/Posts/PostsAndReplies';
 import LikedPosts from './components/Posts/LikedPosts';
 import FolloweesList from './components/FolloweesList';
@@ -128,30 +130,9 @@ const App = () => {
   return (
     <div>
       <Routes location={state?.backgroundLocation || location}>
-        <Route
-          path="/"
-          element={
-            <RequireAuth redirectTo="/signin">
-              <Layout />
-            </RequireAuth>
-          }
-        >
-          <Route
-            index
-            element={
-              <RequireAuth redirectTo="/signin">
-                <Navigate to="home" />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="home"
-            element={
-              <RequireAuth redirectTo="/signin">
-                <Home />
-              </RequireAuth>
-            }
-          />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Navigate to="home" />} />
+          <Route path="home" element={<Home />} />
           <Route
             path="search"
             element={
@@ -320,6 +301,14 @@ const App = () => {
               </RequireAuth>
             }
           />
+          <Route
+            path="device/activation"
+            element={
+              <RequireAuth redirectTo="/signin">
+                <DeviceActivation />
+              </RequireAuth>
+            }
+          />
         </Route>
 
         <Route
@@ -330,36 +319,63 @@ const App = () => {
             </RedirectIfLoggedIn>
           }
         />
-
         <Route path="*" element={<NoMatch />} />
       </Routes>
-      {state?.backgroundLocation &&
-        matchPath('/compose/post', location.pathname) && (
-          <Routes>
-            <Route
-              path="/compose/post"
-              element={
-                <RequireAuth redirectTo="/signin">
-                  <Modal
-                    isOpen
+      {state?.backgroundLocation && matchPath('/signin', location.pathname) && (
+        <Routes>
+          <Route
+            path="/signin"
+            element={
+              <Modal
+                isOpen
+                closeButtonVisible={false}
+                onDismiss={() =>
+                  navigate(`${state.backgroundLocation.pathname}`, {
+                    replace: true,
+                  })
+                }
+                customHeader={
+                  <AddPostHeader
                     onDismiss={() =>
                       navigate(`${state.backgroundLocation.pathname}`, {
                         replace: true,
                       })
                     }
-                    customHeader={
-                      <AddPostHeader
-                        onDismiss={() =>
-                          navigate(`${state.backgroundLocation.pathname}`, {
-                            replace: true,
-                          })
-                        }
-                      />
-                    }
-                  >
-                    <ComposePost />
-                  </Modal>
-                </RequireAuth>
+                  />
+                }
+              >
+                <SigninForm />
+              </Modal>
+            }
+          />
+        </Routes>
+      )}
+      {state?.backgroundLocation &&
+        matchPath('/device/activation', location.pathname) && (
+          <Routes>
+            <Route
+              path="/device/activation"
+              element={
+                <Modal
+                  isOpen
+                  closeButtonVisible={false}
+                  onDismiss={() =>
+                    navigate(`${state.backgroundLocation.pathname}`, {
+                      replace: true,
+                    })
+                  }
+                  customHeader={
+                    <AddPostHeader
+                      onDismiss={() =>
+                        navigate(`${state.backgroundLocation.pathname}`, {
+                          replace: true,
+                        })
+                      }
+                    />
+                  }
+                >
+                  <DeviceActivationForm />
+                </Modal>
               }
             />
           </Routes>

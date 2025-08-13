@@ -1,11 +1,14 @@
+import PropTypes from 'prop-types';
 import { useQuery, useMutation } from 'react-query';
 import { Fragment } from 'react';
 
 import axios from '../../utils/axios';
 import Role from './Role';
 import Spinner from '../Spinner';
+import { useAuth } from '../../contexts/auth-context';
 
-const Roles = () => {
+const Roles = ({ handleModalOpen }) => {
+  const { isAuthenticated } = useAuth();
   const rolesQuery = useQuery(
     ['roles'],
     async () => {
@@ -20,14 +23,20 @@ const Roles = () => {
       refetchOnWindowFocus: false,
     }
   );
-  const devicesQuery = useQuery(['devices'], async () => {
-    try {
-      const response = await axios.get(`/api/users/me/devices`);
-      return response.data;
-    } catch (error) {
-      return error;
+  const devicesQuery = useQuery(
+    ['devices'],
+    async () => {
+      try {
+        const response = await axios.get(`/api/users/me/devices`);
+        return response.data;
+      } catch (error) {
+        return error;
+      }
+    },
+    {
+      enabled: isAuthenticated,
     }
-  });
+  );
   const selectRoleMutation = useMutation(
     ({ id }) => {
       return axios.put(`/api/roles/${id}/device`);
@@ -39,6 +48,20 @@ const Roles = () => {
       },
     }
   );
+  const handleRoleSelect = (id) => {
+    if (!isAuthenticated) {
+      handleModalOpen('/signin');
+      return;
+    }
+    if (!devicesQuery.data) {
+      return;
+    }
+    if (!devicesQuery?.data?.length) {
+      handleModalOpen(`/device/activation?roleId=${id}`);
+      return;
+    }
+    selectRoleMutation.mutate({ id });
+  };
   if (rolesQuery?.isFetching)
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -56,13 +79,17 @@ const Roles = () => {
               role={role}
               key={role.id}
               devices={devicesQuery?.data ?? []}
-              onSelect={(id) => selectRoleMutation.mutate({ id })}
+              onSelect={(id) => handleRoleSelect(id)}
             />
           </Fragment>
         );
       })}
     </div>
   );
+};
+
+Roles.propTypes = {
+  handleModalOpen: PropTypes.func.isRequired,
 };
 
 export default Roles;

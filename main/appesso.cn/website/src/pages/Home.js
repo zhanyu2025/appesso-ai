@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-import Fab from '../components/Fab';
 import PageHeader from '../components/PageHeader';
 
 import usePageTitle from '../hooks/usePageTitle';
@@ -16,15 +15,21 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const openModal = useCallback(() => {
-    setModalOpen(true);
-    navigate('/signin', {
-      state: {
-        backgroundLocation: location,
-      },
-      replace: true,
-    });
-  }, [location, navigate]);
+  const openModal = useCallback(
+    (path) => {
+      // eslint-disable-next-line no-debugger
+      debugger;
+      setModalOpen(true);
+      console.log('open modal');
+      navigate(path, {
+        state: {
+          backgroundLocation: location,
+        },
+        replace: true,
+      });
+    },
+    [location, navigate]
+  );
 
   useEffect(() => {
     if (location.pathname === '/home') {
@@ -35,7 +40,10 @@ const Home = () => {
 
   useEffect(() => {
     if (location.state?.from?.pathname === '/signin') {
-      openModal();
+      openModal('/signin');
+    }
+    if (location.state?.from?.pathname === '/device/activation') {
+      openModal('/device/activation');
     }
   }, [openModal, location.state?.from?.pathname]);
 
@@ -48,10 +56,7 @@ const Home = () => {
       <div className="sticky top-0 left-0 w-full z-[100]">
         <PageHeader title="首页" />
       </div>
-      <Roles />
-      <div className="fixed right-10 bottom-20 z-50">
-        <Fab label="发布" onClick={openModal} />
-      </div>
+      <Roles handleModalOpen={openModal} />
     </div>
   );
 };
