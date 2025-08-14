@@ -4,19 +4,20 @@ const prisma = require('../services/connect-db');
 
 const getAllChatsOfUser = async (req, res, next) => {
   const { userId } = req;
-  const agent = await prisma.ai_agent.findFirst({
+  const device = await prisma.ai_device.findFirst({
     where: {
       user_id: BigInt(userId),
     },
   });
-  if (!agent) return res.status(404).json({ message: '角色不存在' });
+  if (!device)
+    return res.status(404).json({ message: '未绑定任何设备，请先绑定设备！' });
   try {
     const chats = await prisma.ai_agent_chat_history.findMany({
       where: {
-        agent_id: agent.id,
+        agent_id: device.agent_id,
       },
       orderBy: {
-        created_at: 'asc',
+        created_at: 'asc', // Order by creation date in ascending order
       },
     });
     return res.status(200).json({ chats });
