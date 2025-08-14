@@ -12,6 +12,7 @@ const usersRoutes = require('./routes/user');
 const feedRoutes = require('./routes/feed');
 const notificationRoutes = require('./routes/notification');
 const chatRoutes = require('./routes/chat');
+const deviceRoutes = require('./routes/device');
 const searchRoutes = require('./routes/search');
 
 const { errorLogger, errorResponder } = require('./middlewares/error-handler');
@@ -70,6 +71,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/feed', feedRoutes);
 app.use('/api/notification', notificationRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/devices', deviceRoutes);
 app.use('/api/search', searchRoutes);
 
 // Serve React app for non-API routes in production

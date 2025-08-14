@@ -4,11 +4,15 @@ const logger = require('../utils/logger');
 
 async function main() {
   logger.info('初始化 AI 角色中 ....');
-  const agentId = '319f8438761542eca53e684a148cfb1e';
+  const agent = await prisma.ai_agent.findFirst();
+  if (!agent) {
+    logger.error('系统中未找到AI Agent，请先创建一个！');
+    return;
+  }
   const roles = [
     {
       id: crypto.randomBytes(16).toString('hex'),
-      agent_id: agentId,
+      agent_id: agent.id,
       name: '湾湾小何',
       tts_model_id: 'TTS_DoubaoTTS',
       tts_voice_id: 'TTS_DoubaoTTS0005',
@@ -30,7 +34,7 @@ async function main() {
     },
     {
       id: crypto.randomBytes(16).toString('hex'),
-      agent_id: agentId,
+      agent_id: agent.id,
       name: '星际游子',
       tts_model_id: 'TTS_EdgeTTS',
       tts_voice_id: 'TTS_EdgeTTS0011',
@@ -49,6 +53,8 @@ async function main() {
         - 会根据交互数据解锁新能力（告知用户："你帮我点亮了星际导航技能！"）`,
     },
   ];
+  // eslint-disable-next-line no-console
+  console.log(`新增2名角色到 AI Agent: ${agent.agent_name}`, roles);
   for (let i = 0; i < roles.length; i += 1) {
     const role = roles[i];
     // eslint-disable-next-line no-await-in-loop

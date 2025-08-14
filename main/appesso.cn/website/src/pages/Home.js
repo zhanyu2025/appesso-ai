@@ -17,10 +17,7 @@ const Home = () => {
 
   const openModal = useCallback(
     (path) => {
-      // eslint-disable-next-line no-debugger
-      debugger;
       setModalOpen(true);
-      console.log('open modal');
       navigate(path, {
         state: {
           backgroundLocation: location,

@@ -1,34 +1,29 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { useCallback, useRef } from 'react';
-import axios from 'axios';
 
 import TextInput from './TextInput';
 import Button from './Button';
+import axios from '../utils/axios';
 
 import useForm from '../hooks/useForm';
-import { useAuth } from '../contexts/auth-context';
 
 import usePageTitle from '../hooks/usePageTitle';
 
 const DeviceActivationForm = () => {
   usePageTitle('设备激活 / 猿星球');
   const navigate = useNavigate();
-  const location = useLocation();
-  const { login } = useAuth();
   const autoSubmitTimeoutRef = useRef(null);
 
-  const loginMobile = useMutation(({ mobile }) => {
-    return axios.post('/api/auth/login/mobile', {
-      mobile,
-    });
+  const mutation = useMutation(({ code }) => {
+    return axios.post(`/api/devices/${code}/activation`);
   });
 
   const validate = useCallback((values) => {
     const errors = {};
     if (!values.code) {
       errors.code = '激活码不能为空';
-    } else if (!/^\d{6}$/.test(values.mobile)) {
+    } else if (!/^\d{6}$/.test(values.code)) {
       errors.code = '激活码必须是6位数字';
     }
     return errors;
@@ -40,19 +35,13 @@ const DeviceActivationForm = () => {
     },
     validate,
     onSubmit: async (values) => {
-      loginMobile.mutate(
+      mutation.mutate(
         {
-          mobile: values.mobile,
+          code: values.code,
         },
         {
           onSuccess: (response) => {
-            const { user, accessToken, expiresAt } = response.data;
-            login(user, accessToken, expiresAt);
-            if (location.state?.from?.pathname) {
-              navigate(location.state?.from?.pathname);
-            } else {
-              navigate('/');
-            }
+            navigate('/');
           },
           onError: (err) => {
             const error = err.response.data.errors || err.response.data.error;
@@ -63,7 +52,7 @@ const DeviceActivationForm = () => {
               }, {});
               form.setMultipleFieldsError(errors);
             } else {
-              form.setFieldError('mobile', error.message || '登录失败');
+              form.setFieldError('code', error.message || '设备激活失败');
             }
           },
         }
@@ -99,14 +88,6 @@ const DeviceActivationForm = () => {
                     clearTimeout(autoSubmitTimeoutRef.current);
                   }
 
-                  // Log input value for debugging
-                  // console.log(
-                  //   'Input value:',
-                  //   e.target.value,
-                  //   'Length:',
-                  //   e.target.value.length
-                  // );
-
                   // Auto-submit if we have exactly 11 digits
                   if (
                     e.target.value.length === 6 &&
@@ -116,25 +97,18 @@ const DeviceActivationForm = () => {
                     // Small delay to ensure form state is updated
                     autoSubmitTimeoutRef.current = setTimeout(() => {
                       // Double-check validation before submitting
-                      const errors = validate({ mobile: e.target.value });
+                      const errors = validate({ code: e.target.value });
                       // console.log('Validation errors:', errors);
                       if (Object.keys(errors).length === 0) {
                         // console.log('Submitting form automatically');
                         // Manually trigger the form submission by calling the mutation directly
-                        loginMobile.mutate(
+                        mutation.mutate(
                           {
-                            mobile: e.target.value,
+                            code: e.target.value,
                           },
                           {
                             onSuccess: (response) => {
-                              const { user, accessToken, expiresAt } =
-                                response.data;
-                              login(user, accessToken, expiresAt);
-                              if (location.state?.from?.pathname) {
-                                navigate(location.state?.from?.pathname);
-                              } else {
-                                navigate('/');
-                              }
+                              navigate('/');
                             },
                             onError: (err) => {
                               const error =
@@ -162,7 +136,7 @@ const DeviceActivationForm = () => {
               />
             </div>
             <div>
-              <Button type="submit" isLoading={loginMobile.isLoading}>
+              <Button type="submit" isLoading={mutation.isLoading}>
                 立即激活
               </Button>
             </div>

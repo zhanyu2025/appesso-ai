@@ -1,11 +1,11 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { useCallback, useRef } from 'react';
-import axios from 'axios';
 
 import TextInput from './TextInput';
 import Button from './Button';
 
+import axios from '../utils/axios';
 import useForm from '../hooks/useForm';
 import { useAuth } from '../contexts/auth-context';
 
