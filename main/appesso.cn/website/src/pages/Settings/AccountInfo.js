@@ -87,22 +87,12 @@ const AccountInfo = () => {
             </NavLink>
           </li>
           <li className="pb-4">
-            <div className="flex justify-between items-center px-4">
-              <div>
-                <p className="text-on-surface">手机号</p>
-                <p className="text-sm text-on-surface/70 -mt-1">
-                  {data.user.mobile}
-                </p>
-              </div>
-            </div>
-          </li>
-          <li className="pb-4">
             <NavLink to="/settings/birthdate">
               <div className="flex justify-between items-center px-4">
                 <div>
                   <p className="text-on-surface">出生日期</p>
                   <p className="text-sm text-on-surface/70 -mt-1">
-                    {dayjs(data.user.profile.dob).format('MMM D, YYYY')}
+                    {dayjs(data.user.profile.dob).format('YYYY年MMMD')}
                   </p>
                 </div>
                 <div className="text-on-surface/80">
@@ -125,7 +115,7 @@ const AccountInfo = () => {
               <div>
                 <p className="text-on-surface">账户创建时间</p>
                 <p className="text-sm text-on-surface/70 -mt-1">
-                  {dayjs(data.user.createdAt).format('MMM D, YYYY, h:mm:ss A')}
+                  {dayjs(data.user.createdAt).format('YYYY年MMMD, h:mm:ss A')}
                 </p>
               </div>
             </div>

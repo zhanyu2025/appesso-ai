@@ -14,45 +14,15 @@ const {
 const getUserByUsername = async (req, res, next) => {
   const { username } = req.params;
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.User.findUnique({
       where: {
         username,
       },
       select: {
         id: true,
+        create_at: true,
         username: true,
         profile: true,
-        createdAt: true,
-        followedBy: {
-          select: {
-            id: true,
-            username: true,
-            profile: {
-              select: {
-                name: true,
-                img: true,
-              },
-            },
-          },
-        },
-        following: {
-          select: {
-            id: true,
-            username: true,
-            profile: {
-              select: {
-                name: true,
-                img: true,
-              },
-            },
-          },
-        },
-        _count: {
-          select: {
-            followedBy: true,
-            following: true,
-          },
-        },
       },
     });
     if (!user) {
@@ -607,17 +577,19 @@ const updateProfile = async (req, res, next) => {
 
 const getAuthUserInfo = async (req, res, next) => {
   const { userId } = req;
+  const sysUser = await prisma.sys_user.findUnique({
+    where: {
+      id: BigInt(userId),
+    },
+  });
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: {
-        id: userId,
+        sys_user_id: sysUser.id,
       },
       select: {
         id: true,
-        mobile: true,
         username: true,
-        provider: true,
-        createdAt: true,
         profile: true,
       },
     });
@@ -631,15 +603,15 @@ const updateUsername = async (req, res, next) => {
   const { userId } = req;
   const { username } = req.body;
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.User.findFirst({
       where: {
-        id: userId,
+        sys_user_id: BigInt(userId),
       },
     });
     if (!user) {
       throw createError.NotFound();
     }
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.User.update({
       where: {
         id: user.id,
       },
@@ -648,12 +620,7 @@ const updateUsername = async (req, res, next) => {
       },
       select: {
         id: true,
-        email: true,
         username: true,
-        newUser: true,
-        googleId: true,
-        provider: true,
-        createdAt: true,
         profile: true,
       },
     });
@@ -665,22 +632,23 @@ const updateUsername = async (req, res, next) => {
 
 const updateDateOfBirth = async (req, res, next) => {
   const { userId } = req;
+  // eslint-disable-next-line no-console
+  console.log('userId:', userId);
   const { dateOfBirth } = req.body;
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.User.findFirst({
       where: {
-        id: userId,
+        sys_user_id: BigInt(userId),
       },
     });
     if (!user) {
       throw createError.NotFound();
     }
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.User.update({
       where: {
         id: user.id,
       },
       data: {
-        newUser: false,
         profile: {
           update: {
             dob: dateOfBirth,
@@ -689,12 +657,7 @@ const updateDateOfBirth = async (req, res, next) => {
       },
       select: {
         id: true,
-        email: true,
         username: true,
-        newUser: true,
-        googleId: true,
-        provider: true,
-        createdAt: true,
         profile: true,
       },
     });

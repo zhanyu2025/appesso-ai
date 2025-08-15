@@ -1,9 +1,11 @@
 const router = require('express').Router();
 
+const { checkSchema } = require('express-validator');
 const userController = require('../controllers/user');
-const { isAuthenticated } = require('../middlewares/auth');
+const { isAuthenticated, validateRequest } = require('../middlewares/auth');
+const { validateUsername } = require('../services/validators');
 
-// router.get('/user/:username', userController.getUserByUsername);
+router.get('/user/:username', userController.getUserByUsername);
 router.get('/me/devices', isAuthenticated, userController.getMyDevices);
 // router.get('/:id/posts/liked', userController.getLikedPostsByUser);
 // router.patch('/follow', isAuthenticated, userController.followUser);
@@ -18,21 +20,15 @@ router.get('/me/devices', isAuthenticated, userController.getMyDevices);
 //   validateRequest,
 //   userController.updateProfile
 // );
-// router.patch(
-//   '/me/username',
-//   isAuthenticated,
-//   checkSchema(validateUsername),
-//   validateRequest,
-//   userController.updateUsername
-// );
+router.patch(
+  '/me/username',
+  isAuthenticated,
+  checkSchema(validateUsername),
+  validateRequest,
+  userController.updateUsername
+);
 
-// router.patch(
-//   '/me/dob',
-//   isAuthenticated,
-//   checkSchema(validateDateOfBirth),
-//   validateRequest,
-//   userController.updateDateOfBirth
-// );
+router.patch('/me/dob', isAuthenticated, userController.updateDateOfBirth);
 router.get('/me', isAuthenticated, userController.getAuthUserInfo);
 
 module.exports = router;

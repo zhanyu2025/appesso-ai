@@ -6,7 +6,7 @@ const searchUsersByUsername = async (req, res, next) => {
   const limit = Number(req.query.limit) || 10;
 
   try {
-    const total = await prisma.user.count({
+    const total = await prisma.User.count({
       where: {
         username: {
           startsWith: username,
@@ -14,7 +14,7 @@ const searchUsersByUsername = async (req, res, next) => {
         },
       },
     });
-    const users = await prisma.user.findMany({
+    const users = await prisma.User.findMany({
       where: {
         username: {
           startsWith: username,
@@ -27,7 +27,6 @@ const searchUsersByUsername = async (req, res, next) => {
         profile: {
           select: {
             name: true,
-            img: true,
           },
         },
       },
@@ -53,22 +52,20 @@ const searchUsersByName = async (req, res, next) => {
   const limit = Number(req.query.limit) || 10;
 
   try {
-    const total = await prisma.user.count({
+    const total = await prisma.User.count({
       where: {
         profile: {
           name: {
             startsWith: name,
-            mode: 'insensitive',
           },
         },
       },
     });
-    const users = await prisma.user.findMany({
+    const users = await prisma.User.findMany({
       where: {
         profile: {
           name: {
             startsWith: name,
-            mode: 'insensitive',
           },
         },
       },
@@ -78,7 +75,6 @@ const searchUsersByName = async (req, res, next) => {
         profile: {
           select: {
             name: true,
-            img: true,
           },
         },
       },

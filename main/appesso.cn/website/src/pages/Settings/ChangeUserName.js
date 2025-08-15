@@ -25,7 +25,7 @@ const ChangeUserName = () => {
   const { validateForm } = changeUsernameValidator;
 
   const changeUsernameMutation = useMutation(({ username }) => {
-    return axios.patch('/api/users/my/username', {
+    return axios.patch('/api/users/me/username', {
       username,
     });
   });

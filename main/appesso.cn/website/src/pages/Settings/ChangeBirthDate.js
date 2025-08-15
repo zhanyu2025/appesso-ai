@@ -23,7 +23,7 @@ const ChangeBirthDate = () => {
   const { validateForm } = ChangeBirthDateValidator;
 
   const updateDOB = useMutation(({ dateOfBirth }) => {
-    return axios.patch('/api/users/my/dob', {
+    return axios.patch('/api/users/me/dob', {
       dateOfBirth,
     });
   });
@@ -111,19 +111,6 @@ const ChangeBirthDate = () => {
           onSubmit={form.handleSubmit}
         >
           <div className="flex justify-between gap-3 mb-4">
-            <div className="w-1/2">
-              <SelectInput
-                id="month"
-                name="month"
-                value={form.values.month}
-                label="月"
-                onFocus={form.handleFocus}
-                onBlur={form.handleBlur}
-                onChange={form.handleChange}
-                error={form.touched.month ? form.errors.month : ''}
-                options={DateOptions.months}
-              />
-            </div>
             <div className="w-1/4">
               <SelectInput
                 id="year"
@@ -135,6 +122,19 @@ const ChangeBirthDate = () => {
                 onChange={form.handleChange}
                 error={form.touched.year ? form.errors.year : ''}
                 options={DateOptions.getYearsInRange(DateOptions.year_range)}
+              />
+            </div>
+            <div className="w-1/2">
+              <SelectInput
+                id="month"
+                name="month"
+                value={form.values.month}
+                label="月"
+                onFocus={form.handleFocus}
+                onBlur={form.handleBlur}
+                onChange={form.handleChange}
+                error={form.touched.month ? form.errors.month : ''}
+                options={DateOptions.months}
               />
             </div>
             <div className="w-1/4">

@@ -58,23 +58,23 @@ const validateUsername = {
   username: {
     trim: true,
     notEmpty: {
-      errorMessage: 'This is a mandatory field',
+      errorMessage: '用户名不能为空',
     },
     isLength: {
       options: {
         min: 3,
         max: 30,
       },
-      errorMessage: 'Username must be between 3 and 30 characters long',
+      errorMessage: '用户名长度必须在3到30个字符之间',
     },
     matches: {
       options: [/^[a-zA-Z0-9_]+$/],
-      errorMessage: 'Username must be alphanumeric',
+      errorMessage: '用户名只能包含字母、数字和下划线',
     },
     custom: {
       options: (value) => {
         if (value.includes('@')) {
-          throw new Error('Username must not contain @');
+          throw new Error('用户名不能包含@');
         }
         return true;
       },
@@ -85,17 +85,17 @@ const validateUsername = {
 const validateDateOfBirth = {
   month: {
     notEmpty: {
-      errorMessage: 'This is a mandatory field',
+      errorMessage: '月份不能为空',
     },
   },
   day: {
     notEmpty: {
-      errorMessage: 'This is a mandatory field',
+      errorMessage: '日期不能为空',
     },
   },
   year: {
     notEmpty: {
-      errorMessage: 'This is a mandatory field',
+      errorMessage: '年份不能为空',
     },
   },
 };

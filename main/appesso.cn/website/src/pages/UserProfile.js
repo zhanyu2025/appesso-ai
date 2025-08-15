@@ -44,60 +44,6 @@ const UserProfile = () => {
     }
   }, [user, setPageTitle]);
 
-  const followUser = useMutation(
-    ({ followeeId }) => {
-      return axios.patch('/api/users/follow', {
-        followeeId,
-      });
-    },
-    {
-      onSuccess: (data) => {
-        queryClient.invalidateQueries('user');
-        socket.emit('new notification', {
-          to: data.data.followeeId,
-        });
-      },
-    }
-  );
-
-  const unFollowUser = useMutation(
-    ({ followeeId }) => {
-      return axios.patch('/api/users/unfollow', {
-        followeeId,
-      });
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('user');
-      },
-    }
-  );
-
-  const getChat = useMutation(
-    ({ participantId }) => {
-      return axios.post('/api/chat/new', {
-        participantId,
-      });
-    },
-    {
-      onSuccess: (data) => {
-        navigate(`/messages/${data.data.id}`);
-      },
-    }
-  );
-
-  const onFollowUser = () => {
-    followUser.mutate({
-      followeeId: user?.id,
-    });
-  };
-
-  const onUnFollowUser = () => {
-    unFollowUser.mutate({
-      followeeId: user?.id,
-    });
-  };
-
   const openModal = useCallback(() => {
     navigate('/settings/profile', {
       state: {
@@ -129,7 +75,7 @@ const UserProfile = () => {
         <div className="flex justify-between mt-2">
           <div className="w-24 h-24 rounded-full overflow-hidden -mt-14">
             <img
-              src={user.profile.img}
+              src={user.profile?.img ?? '/avatars/default.webp'}
               alt="User avatar"
               className="w-full h-full object-cover"
             />
@@ -145,53 +91,6 @@ const UserProfile = () => {
               </button>
             </div>
           )}
-          {isAuthenticated && user.id !== authUser.id && (
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="text-on-surface border border-on-surface/30 p-1 rounded-full"
-                onClick={() => {
-                  getChat.mutate({
-                    participantId: user.id,
-                  });
-                }}
-              >
-                <IconContext.Provider
-                  // eslint-disable-next-line react/jsx-no-constructed-context-values
-                  value={{
-                    size: '18px',
-                    style: {
-                      color: 'inherit',
-                    },
-                  }}
-                >
-                  <RiMailLine />
-                </IconContext.Provider>
-              </button>
-              {user.followedBy.every(
-                (follower) => follower.id !== authUser.id
-              ) && (
-                <button
-                  type="button"
-                  className="bg-on-surface text-surface font-source-sans-pro text-sm font-bold px-4 py-2 rounded-full w-24"
-                  onClick={onFollowUser}
-                >
-                  关注
-                </button>
-              )}
-              {user.followedBy.some(
-                (follower) => follower.id === authUser.id
-              ) && (
-                <button
-                  type="button"
-                  className="bg-on-surface text-surface font-source-sans-pro text-sm font-bold px-4 py-2 rounded-full w-24"
-                  onClick={onUnFollowUser}
-                >
-                  取消关注
-                </button>
-              )}
-            </div>
-          )}
         </div>
         <div className="mt-5">
           <h2 className="text-on-surface text-lg font-bold">
@@ -203,37 +102,6 @@ const UserProfile = () => {
           <p className="text-on-surface/95">{user.profile.bio}</p>
         </div>
         <div className="my-4 flex gap-2 flex-col sm:flex-row">
-          {user.profile.website && (
-            <div className="flex gap-1 items-center">
-              <span className="text-on-surface/75">
-                <IconContext.Provider
-                  value={{
-                    size: '18px',
-                    style: {
-                      color: 'inherit',
-                    },
-                  }}
-                >
-                  <RiLinksLine />
-                </IconContext.Provider>
-              </span>
-              <span>
-                <a
-                  href={`${
-                    user.profile.website.startsWith('https://') ||
-                    user.profile.website.startsWith('http://')
-                      ? user.profile.website
-                      : `//${user.profile.website}`
-                  }`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary"
-                >
-                  {user.profile.website}
-                </a>
-              </span>
-            </div>
-          )}
           <div className="text-on-surface/75 flex items-center gap-1">
             <span>
               <IconContext.Provider
@@ -249,64 +117,13 @@ const UserProfile = () => {
             </span>
             <span>
               加入于{' '}
-              {new Date(user.createdAt).toLocaleString('zh-CN', {
+              {new Date(user.create_at).toLocaleString('zh-CN', {
                 month: 'long',
                 year: 'numeric',
               })}
             </span>
           </div>
         </div>
-        <div className="flex text-on-surface gap-4">
-          <div>
-            {user.following.length}{' '}
-            <Link to="list/following" className="text-on-surface/75">
-              关注中
-            </Link>
-          </div>
-          <div>
-            {user.followedBy.length}{' '}
-            <Link to="list/followers" className="text-on-surface/75">
-              粉丝
-            </Link>
-          </div>
-        </div>
-      </div>
-      <div className="px-3 flex justify-between text-on-surface/75 mt-6">
-        <NavLink
-          to=""
-          end
-          className={({ isActive }) =>
-            `pb-1 ${
-              isActive ? 'text-on-surface border-b-2 border-primary' : ''
-            }`
-          }
-        >
-          帖子
-        </NavLink>
-        <NavLink
-          to="with_replies"
-          className={({ isActive }) =>
-            `pb-1 ${
-              isActive ? 'text-on-surface border-b-2 border-primary' : ''
-            }`
-          }
-        >
-          帖子和回复
-        </NavLink>
-        <NavLink
-          to="likes"
-          className={({ isActive }) =>
-            `pb-1 ${
-              isActive ? 'text-on-surface border-b-2 border-primary' : ''
-            }`
-          }
-        >
-          喜欢
-        </NavLink>
-      </div>
-      <div className="h-[1px] bg-on-surface/30 my-3" />
-      <div className="px-3 pb-14">
-        <Outlet context={{ userId: user.id }} />
       </div>
     </div>
   );

@@ -41,7 +41,7 @@ const Role = ({ role, devices, onSelect }) => {
             }
           />
         </div>
-        <p className="text-sm text-white/25 text-pretty line-clamp-3">
+        <p className="text-sm text-on-surface/70 text-pretty line-clamp-3">
           {role.system_prompt}
         </p>
       </div>

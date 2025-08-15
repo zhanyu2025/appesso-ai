@@ -16,7 +16,6 @@ const isAuthenticated = async (req, res, next) => {
     if (!authHeader) {
       return next(createError.Unauthorized('Authorization header missing'));
     }
-
     const token = authHeader.split('Bearer ')[1];
     if (!token) {
       return next(createError.Unauthorized('Token missing from header'));
