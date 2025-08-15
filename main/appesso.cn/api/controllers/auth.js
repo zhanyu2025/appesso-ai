@@ -1,15 +1,9 @@
 const createError = require('http-errors');
-const { customAlphabet } = require('nanoid');
-const jwt = require('jsonwebtoken');
 const ms = require('ms');
 
 const prisma = require('../services/connect-db');
 const { clearTokens, generateJWT } = require('../utils/auth');
-const {
-  REFRESH_TOKEN_SECRET,
-  ACCESS_TOKEN_SECRET,
-  ACCESS_TOKEN_LIFE,
-} = require('../utils/config');
+const { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_LIFE } = require('../utils/config');
 
 const loginMobile = async (req, res, next) => {
   const { mobile } = req.body;
@@ -41,14 +35,13 @@ const loginMobile = async (req, res, next) => {
 
 const verifyAndGenerateAccessToken = async (req, res, next) => {
   const { signedCookies } = req;
-  const { accessToken } = signedCookies;
-  if (!accessToken) {
+  if (!signedCookies.accessToken) {
     return res.sendStatus(204);
   }
   try {
     const token = await prisma.sys_user_token.findFirst({
       where: {
-        token: accessToken,
+        token: signedCookies.accessToken,
       },
     });
     if (!token) {
@@ -57,29 +50,39 @@ const verifyAndGenerateAccessToken = async (req, res, next) => {
       throw error;
     }
     try {
-      const user = await prisma.sys_user.findUnique({
+      const sysUser = await prisma.sys_user.findUnique({
         where: {
           id: token.user_id,
         },
         select: {
           id: true,
-          username: true,
         },
       });
-      if (!user) {
+      const user = await prisma.User.findFirst({
+        where: {
+          sys_user_id: BigInt(sysUser.id),
+        },
+        select: {
+          username: true,
+          profile: true,
+        },
+      });
+      if (!sysUser || !user) {
         await clearTokens(req, res);
         const error = createError('Invalid credentials', 401);
         throw error;
       }
       const accessToken = generateJWT(
-        user.id,
+        sysUser.id,
         ACCESS_TOKEN_SECRET,
         ACCESS_TOKEN_LIFE
       );
       return res.status(200).json({
         user: {
-          ...user,
-          id: String(user.id),
+          ...sysUser,
+          id: String(sysUser.id),
+          profile: user.profile,
+          username: user.username,
         },
         accessToken,
         expiresAt: new Date(Date.now() + ms(ACCESS_TOKEN_LIFE)),

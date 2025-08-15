@@ -8,7 +8,6 @@ const PageHeader = ({ title }) => {
   const [, setOpenSideDrawer] = useOutletContext();
   const { user } = useAuth();
   const isMobileDevice = useMediaQuery('(max-width: 639px)');
-
   return (
     <div className="bg-surface h-14 flex justify-between items-center px-3">
       <button
@@ -18,7 +17,7 @@ const PageHeader = ({ title }) => {
       >
         <img
           className="h-full w-full rounded-full object-cover"
-          src={user.username}
+          src={user?.avatar ?? '/avatars/default.webp'}
           alt="avatar"
         />
       </button>

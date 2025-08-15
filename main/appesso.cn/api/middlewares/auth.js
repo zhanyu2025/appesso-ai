@@ -59,7 +59,7 @@ const generateAuthTokens = async (req, res, next) => {
       throw createError.InternalServerError('User ID not found on request');
     }
 
-    const user = await prisma.sys_user.findUnique({
+    const sysUser = await prisma.sys_user.findUnique({
       where: { id: req.userId },
       select: {
         id: true,
@@ -68,7 +68,14 @@ const generateAuthTokens = async (req, res, next) => {
       },
     });
 
-    if (!user) {
+    const user = await prisma.User.findFirst({
+      where: { sys_user_id: BigInt(req.userId) },
+      select: {
+        profile: true,
+        username: true,
+      },
+    });
+    if (!sysUser || !user) {
       throw createError.Unauthorized('User not found');
     }
 
@@ -103,8 +110,10 @@ const generateAuthTokens = async (req, res, next) => {
 
     return res.status(200).json({
       user: {
-        ...user,
-        id: user.id.toString(),
+        ...sysUser,
+        profile: user.profile,
+        username: user.username,
+        id: sysUser.id.toString(),
       },
       accessToken,
       expiresAt: expireDate,

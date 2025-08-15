@@ -334,3 +334,24 @@ model ai_device_role {
   create_date DateTime  @db.DateTime(0)
   update_date DateTime? @db.DateTime(0)
 }
+
+model User {
+  id          String    @id @unique @db.VarChar(32)
+  username    String    @unique @db.VarChar(50)
+  profile     Profile?
+  sys_user_id BigInt?
+  ai_role_id  String?   @db.VarChar(32)
+  create_at   DateTime  @default(now()) @db.DateTime(0)
+  update_at   DateTime? @db.DateTime(0)
+}
+
+model Profile {
+  id        String    @id @unique @db.VarChar(32)
+  user_id   String    @unique @db.VarChar(32)
+  name      String    @db.VarChar(50)
+  create_at DateTime  @default(now()) @db.DateTime(0)
+  update_at DateTime? @db.DateTime(0)
+  user      User?     @relation(fields: [user_id], references: [id])
+  bio       String?   @db.VarChar(255)
+  dob       DateTime?
+}

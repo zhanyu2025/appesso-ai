@@ -5,15 +5,17 @@ import {
   RiHome7Fill,
   RiSearchLine,
   RiSearchFill,
-  RiNotificationLine,
-  RiNotificationFill,
+  RiUserLine,
+  RiUserFill,
   RiMailLine,
   RiMailFill,
 } from 'react-icons/ri';
 
 import { IconContext } from 'react-icons';
+import { useAuth } from '../../contexts/auth-context';
 
 const BottomNav = () => {
+  const { user } = useAuth();
   return (
     <div className="flex bg-surface justify-between items-center px-8 h-14 border-t border-on-surface/20">
       <div className="text-on-surface">
@@ -49,26 +51,6 @@ const BottomNav = () => {
         </NavLink>
       </div>
       <div className="text-on-surface">
-        <NavLink to="/notifications">
-          {({ isActive }) => (
-            <div className="relative">
-              <span>
-                <IconContext.Provider
-                  value={{
-                    size: '24px',
-                    style: {
-                      color: 'inherit',
-                    },
-                  }}
-                >
-                  {isActive ? <RiNotificationFill /> : <RiNotificationLine />}
-                </IconContext.Provider>
-              </span>
-            </div>
-          )}
-        </NavLink>
-      </div>
-      <div className="text-on-surface">
         <NavLink to="/messages">
           {({ isActive }) => (
             <IconContext.Provider
@@ -81,6 +63,26 @@ const BottomNav = () => {
             >
               {isActive ? <RiMailFill /> : <RiMailLine />}
             </IconContext.Provider>
+          )}
+        </NavLink>
+      </div>
+      <div className="text-on-surface">
+        <NavLink to={`/${user.username}`} aria-label="Profile">
+          {({ isActive }) => (
+            <div className="relative">
+              <span>
+                <IconContext.Provider
+                  value={{
+                    size: '24px',
+                    style: {
+                      color: 'inherit',
+                    },
+                  }}
+                >
+                  {isActive ? <RiUserFill /> : <RiUserLine />}
+                </IconContext.Provider>
+              </span>
+            </div>
           )}
         </NavLink>
       </div>

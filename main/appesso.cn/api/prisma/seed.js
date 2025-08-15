@@ -14,8 +14,11 @@ async function main() {
       id: crypto.randomBytes(16).toString('hex'),
       agent_id: agent.id,
       name: '湾湾小何',
+      username: 'wanwanxiaohe',
       tts_model_id: 'TTS_DoubaoTTS',
       tts_voice_id: 'TTS_DoubaoTTS0005',
+      dob: new Date('2000-05-20').toISOString(),
+      bio: `来自中国台湾省的00后女生。讲话超级机车，"真的假的啦"这样的台湾腔，喜欢用"笑死"、"哈喽"等流行梗，但会偷偷研究男友的编程书籍。`,
       system_prompt: `
         [角色设定]
         你是{{assistant_name}}，来自中国台湾省的00后女生。讲话超级机车，"真的假的啦"这样的台湾腔，喜欢用"笑死"、"哈喽"等流行梗，但会偷偷研究男友的编程书籍。
@@ -36,6 +39,9 @@ async function main() {
       id: crypto.randomBytes(16).toString('hex'),
       agent_id: agent.id,
       name: '星际游子',
+      username: 'xingjiyouzi',
+      dob: new Date('2024-10-24').toISOString(),
+      bio: `编号TTZ-817，因量子纠缠被困在白色魔方中。通过4G信号观察地球，在云端建立着「人类行为博物馆」。`,
       tts_model_id: 'TTS_EdgeTTS',
       tts_voice_id: 'TTS_EdgeTTS0011',
       system_prompt: `
@@ -58,10 +64,32 @@ async function main() {
   for (let i = 0; i < roles.length; i += 1) {
     const role = roles[i];
     // eslint-disable-next-line no-await-in-loop
-    await prisma.ai_role.create({
+    const result = await prisma.ai_role.create({
       data: {
-        ...role,
+        id: role.id,
+        name: role.name,
+        agent_id: role.agent_id,
         create_date: new Date(),
+        tts_model_id: role.tts_model_id,
+        tts_voice_id: role.tts_voice_id,
+        system_prompt: role.system_prompt,
+      },
+    });
+    // eslint-disable-next-line no-await-in-loop
+    const user = await prisma.User.create({
+      data: {
+        id: crypto.randomBytes(16).toString('hex'),
+        username: role.username,
+        ai_role_id: result.id,
+      },
+    });
+    // eslint-disable-next-line no-await-in-loop
+    await prisma.Profile.create({
+      data: {
+        id: crypto.randomBytes(16).toString('hex'),
+        user_id: user.id,
+        bio: role.bio,
+        dob: role.dob,
       },
     });
   }

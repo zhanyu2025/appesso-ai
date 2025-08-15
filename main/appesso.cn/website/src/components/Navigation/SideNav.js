@@ -1,8 +1,8 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
 import { useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { IconContext } from 'react-icons';
 import { useMutation, useQueryClient } from 'react-query';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   RiShareLine,
   RiHome7Line,
@@ -11,8 +11,6 @@ import {
   RiSearchFill,
   RiMailLine,
   RiMailFill,
-  RiNotificationLine,
-  RiNotificationFill,
   RiUserLine,
   RiUserFill,
   RiSettingsLine,
@@ -30,12 +28,10 @@ import axios from '../../utils/axios';
 const SideNav = () => {
   const [, setModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
-
   const { user, logout } = useAuth();
-
   const logoutMutation = useMutation(
     () => {
       return axios.post('/api/auth/logout');
@@ -52,7 +48,7 @@ const SideNav = () => {
 
   const openModal = () => {
     setModalOpen(true);
-    navigate('/compose/post', {
+    navigate('/signin', {
       state: {
         backgroundLocation: location,
       },
@@ -61,6 +57,9 @@ const SideNav = () => {
   };
 
   const handleDropDownOpen = (evt) => {
+    if (!user.id) {
+      openModal();
+    }
     setAnchorEl(evt.currentTarget);
   };
 
@@ -252,59 +251,69 @@ const SideNav = () => {
         >
           <img
             className="h-full w-full rounded-full object-cover"
-            src={user.username}
+            src={user?.avatar ?? '/avatars/default.webp'}
             alt="avatar"
           />
         </div>
-        <div className="flex justify-between flex-1 items-center sm:hidden lg:flex">
-          <div>
-            <p className="font-semibold">{user.username}</p>
-            <p className="text-sm text-on-surface/70 -mt-1">@{user.username}</p>
-          </div>
-          <button
-            type="button"
-            onClick={handleDropDownOpen}
-            className="font-bold"
-          >
-            ...
-          </button>
-        </div>
-        <DropDown
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleDropDownClose}
-        >
-          <DropDownItem onClose={handleDropDownClose}>
-            <Link to={`/${user.username}`}>
-              <div className="flex gap-2 relative px-4 py-4 border-b border-on-surface/20">
-                <div className="h-10 w-10 overflow-hidden">
-                  <img
-                    className="h-full w-full rounded-full object-cover"
-                    src={user?.avatar ?? '/avatars/default.webp'}
-                    alt="avatar"
-                  />
-                </div>
-                <div className="flex justify-between flex-1 items-center">
-                  <div>
-                    <p className="font-semibold">{user.username}</p>
-                    <p className="text-sm text-on-surface/70 -mt-1">
-                      @{user.username}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </DropDownItem>
-          <DropDownItem onClose={handleDropDownClose}>
+        {user?.id ? (
+          <div className="flex justify-between flex-1 items-center sm:hidden lg:flex">
+            <div>
+              <p className="font-semibold">{user.profile.name}</p>
+              <p className="text-sm text-on-surface/70 -mt-1">
+                @{user.username}
+              </p>
+            </div>
             <button
               type="button"
-              className="px-4 py-3 w-full text-left"
-              onClick={() => logoutMutation.mutate()}
+              onClick={handleDropDownOpen}
+              className="font-bold"
             >
-              退出登录 @{user.username}
+              ...
             </button>
-          </DropDownItem>
-        </DropDown>
+          </div>
+        ) : (
+          <div className="text-on-surface flex items-center">
+            <p className="text-lg false sm:hidden lg:inline">立即登录</p>
+          </div>
+        )}
+        {user?.id && (
+          <DropDown
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleDropDownClose}
+          >
+            <DropDownItem onClose={handleDropDownClose}>
+              <Link to={`/${user.username}`}>
+                <div className="flex gap-2 relative px-4 py-4 border-b border-on-surface/20">
+                  <div className="h-10 w-10 overflow-hidden">
+                    <img
+                      className="h-full w-full rounded-full object-cover"
+                      src={user?.avatar ?? '/avatars/default.webp'}
+                      alt="avatar"
+                    />
+                  </div>
+                  <div className="flex justify-between flex-1 items-center">
+                    <div>
+                      <p className="font-semibold">{user.profile.name}</p>
+                      <p className="text-sm text-on-surface/70 -mt-1">
+                        @{user.username}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </DropDownItem>
+            <DropDownItem onClose={handleDropDownClose}>
+              <button
+                type="button"
+                className="px-4 py-3 w-full text-left"
+                onClick={() => logoutMutation.mutate()}
+              >
+                退出登录 @{user.username}
+              </button>
+            </DropDownItem>
+          </DropDown>
+        )}
       </div>
     </div>
   );
