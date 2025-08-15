@@ -4,6 +4,7 @@ import asyncio
 import copy
 import json
 import logging
+import os
 import uuid
 
 import websockets
@@ -45,6 +46,13 @@ async def main():
     )
 
     args = parser.parse_args()
+
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_dir = os.path.join(script_dir, "outputs")
+
+    # Create the outputs directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
 
     # Connect to server
     headers = {
@@ -147,7 +155,8 @@ async def main():
 
             # Save audio file if we received any data
             if audio_data:
-                filename = f"{args.voice_type}_session_{i}.{args.encoding}"
+                # Construct the full path for the output file
+                filename = os.path.join(output_dir, f"{args.voice_type}_session_{i}.{args.encoding}")
                 with open(filename, "wb") as f:
                     f.write(audio_data)
                 logger.info(f"Audio received: {len(audio_data)}, saved to {filename}")

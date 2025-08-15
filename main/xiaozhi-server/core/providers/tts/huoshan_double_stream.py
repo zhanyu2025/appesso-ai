@@ -149,6 +149,7 @@ class TTSProvider(TTSProviderBase):
         self.cluster = config.get("cluster")
         self.resource_id = config.get("resource_id")
         if config.get("private_voice"):
+            self.resource_id = "volc.megatts.default"
             self.voice = config.get("private_voice")
         else:
             self.voice = config.get("speaker")
@@ -222,7 +223,7 @@ class TTSProvider(TTSProviderBase):
                 if message.sentence_type == SentenceType.FIRST:
                     # 初始化参数
                     try:
-                        if not getattr(self.conn, "sentence_id", None): 
+                        if not getattr(self.conn, "sentence_id", None):
                             self.conn.sentence_id = uuid.uuid4().hex
                             logger.bind(tag=TAG).info(f"自动生成新的 会话ID: {self.conn.sentence_id}")
 

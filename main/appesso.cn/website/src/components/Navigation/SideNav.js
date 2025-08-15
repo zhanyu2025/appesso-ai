@@ -178,41 +178,6 @@ const SideNav = () => {
               </NavLink>
             </li>
             <li className="text-on-surface mb-3">
-              <NavLink to="/notifications" aria-label="Notifications">
-                {({ isActive }) => (
-                  <div
-                    className={`relative flex items-center gap-3 rounded-3xl px-4 py-2 w-fit ${
-                      isActive && 'bg-on-surface/10'
-                    }`}
-                  >
-                    <span>
-                      <IconContext.Provider
-                        value={{
-                          size: '24px',
-                          style: {
-                            color: 'inherit',
-                          },
-                        }}
-                      >
-                        {isActive ? (
-                          <RiNotificationFill />
-                        ) : (
-                          <RiNotificationLine />
-                        )}
-                      </IconContext.Provider>
-                    </span>
-                    <span
-                      className={`text-xl ${
-                        isActive && 'font-semibold'
-                      } sm:hidden lg:inline`}
-                    >
-                      通知
-                    </span>
-                  </div>
-                )}
-              </NavLink>
-            </li>
-            <li className="text-on-surface mb-3">
               <NavLink to={`/${user.username}`} aria-label="Profile">
                 {({ isActive }) => (
                   <div
@@ -275,17 +240,6 @@ const SideNav = () => {
               </NavLink>
             </li>
           </ul>
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={openModal}
-              className="bg-primary text-on-primary text-base w-full py-3 rounded-3xl sm:w-12 lg:w-full"
-              aria-label="Add Post"
-            >
-              <span className="sm:hidden lg:inline">发布</span>
-              <span className="hidden sm:inline lg:hidden">+</span>
-            </button>
-          </div>
         </nav>
       </div>
       <div className="flex gap-2 relative">
@@ -326,7 +280,7 @@ const SideNav = () => {
                 <div className="h-10 w-10 overflow-hidden">
                   <img
                     className="h-full w-full rounded-full object-cover"
-                    src={user.username}
+                    src={user?.avatar ?? '/avatars/default.webp'}
                     alt="avatar"
                   />
                 </div>
