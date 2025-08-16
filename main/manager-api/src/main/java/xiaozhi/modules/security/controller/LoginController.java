@@ -110,10 +110,11 @@ public class LoginController {
         // 是否开启手机注册
         Boolean isMobileRegister = sysParamsService
                 .getValueObject(Constant.SysMSMParam.SERVER_ENABLE_MOBILE_REGISTER.getValue(), Boolean.class);
+
         boolean validate;
         if (isMobileRegister) {
             // 验证用户是否是手机号码
-            boolean validPhone = ValidatorUtils.isValidPhone(login.getUsername());
+            boolean validPhone = ValidatorUtils.isValidPhone(login.getUsername()); // 修改这里
             if (!validPhone) {
                 throw new RenException("用户名不是手机号码，请重新输入");
             }
@@ -139,6 +140,13 @@ public class LoginController {
         userDTO.setUsername(login.getUsername());
         userDTO.setPassword(login.getPassword());
         sysUserService.save(userDTO);
+
+        // 如果是手机号码注册，则同步创建User表和Profile表记录
+
+        if (ValidatorUtils.isValidLocalPhone(login.getUsername())) {
+            sysUserService.createAppUserAndProfile(userDTO.getId());
+        }
+
         return new Result<>();
     }
 

@@ -21,14 +21,14 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 
     /**
      * 删除指定用户，且有关联的数据设备和智能体
-     * 
+     *
      * @param ids
      */
     void deleteById(Long ids);
 
     /**
      * 验证是否允许修改密码更改
-     * 
+     *
      * @param userId      用户id
      * @param passwordDTO 验证密码的参数
      */
@@ -36,7 +36,7 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 
     /**
      * 直接修改密码，不需要验证
-     * 
+     *
      * @param userId   用户id
      * @param password 密码
      */
@@ -44,7 +44,7 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 
     /**
      * 重置密码
-     * 
+     *
      * @param userId 用户id
      * @return 随机生成符合规范的密码
      */
@@ -52,7 +52,7 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 
     /**
      * 管理员分页用户信息
-     * 
+     *
      * @param dto 分页查找参数
      * @return 用户列表分页数据
      */
@@ -60,7 +60,7 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 
     /**
      * 批量修改用户状态
-     * 
+     *
      * @param status  用户状态
      * @param userIds 用户ID数组
      */
@@ -68,8 +68,14 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 
     /**
      * 获取是否允许用户注册
-     * 
+     *
      * @return 是否允许用户注册
      */
     boolean getAllowUserRegister();
+
+    /**
+     * 创建 App User 表和 Profile 表记录
+     * @param sysUserId sys_user 表的 ID
+     */
+    void createAppUserAndProfile(Long sysUserId);
 }

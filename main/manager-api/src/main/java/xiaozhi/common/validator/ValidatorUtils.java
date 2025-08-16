@@ -58,10 +58,15 @@ public class ValidatorUtils {
     private static final String INTERNATIONAL_PHONE_REGEX = "^\\+[1-9]\\d{0,3}[1-9]\\d{4,14}$";
 
     /**
-     * 校验手机号是否有效
+     * 中国大陆手机号正则表达式 (11位数字)
+     */
+    private static final String CHINA_MOBILE_REGEX = "^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$";
+
+    /**
+     * 校验手机号是否有效 (带国际区号)
      * 要求必须带国际区号，格式：+[国家代码][手机号]
      * 例如：+8613800138000
-     * 
+     *
      * @param phone 手机号
      * @return boolean
      */
@@ -72,6 +77,23 @@ public class ValidatorUtils {
 
         // 验证必须带国际区号的手机号格式
         Pattern pattern = Pattern.compile(INTERNATIONAL_PHONE_REGEX);
+        return pattern.matcher(phone).matches();
+    }
+
+    /**
+     * 校验手机号是否有效 (中国大陆11位手机号，不带国际区号)
+     * 例如：13800138000
+     *
+     * @param phone 手机号
+     * @return boolean
+     */
+    public static boolean isValidLocalPhone(String phone) {
+        if (phone == null || phone.isEmpty()) {
+            return false;
+        }
+
+        // 验证中国大陆11位手机号格式
+        Pattern pattern = Pattern.compile(CHINA_MOBILE_REGEX);
         return pattern.matcher(phone).matches();
     }
 }

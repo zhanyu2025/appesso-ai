@@ -33,6 +33,10 @@ import xiaozhi.modules.sys.enums.SuperAdminEnum;
 import xiaozhi.modules.sys.service.SysParamsService;
 import xiaozhi.modules.sys.service.SysUserService;
 import xiaozhi.modules.sys.vo.AdminPageUserVO;
+import xiaozhi.modules.app.dto.ProfileDTO; // 导入 ProfileDTO
+import xiaozhi.modules.app.dto.UserDTO; // 导入 UserDTO
+import xiaozhi.modules.app.service.ProfileService; // 导入 ProfileService
+import xiaozhi.modules.app.service.UserService; // 导入 UserService
 
 /**
  * 系统用户
@@ -47,6 +51,10 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
     private final AgentService agentService;
 
     private final SysParamsService sysParamsService;
+
+    private final UserService userService; // 注入 UserService
+
+    private final ProfileService profileService; // 注入 ProfileService
 
     @Override
     public SysUserDTO getByUsername(String username) {
@@ -192,7 +200,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
 
     /**
      * 生成随机密码
-     * 
+     *
      * @return 随机生成的密码
      */
     private String generatePassword() {
@@ -201,6 +209,16 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
             password.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
         }
         return password.toString();
+    }
+
+    /**
+     * 生成6位随机数字
+     * @return 6位随机数字字符串
+     */
+    private String generateSixDigitRandomNumber() {
+        Random random = new Random();
+        int number = random.nextInt(900000) + 100000; // 生成100000-999999之间的随机数
+        return String.valueOf(number);
     }
 
     @Override
@@ -225,5 +243,28 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
             return true;
         }
         return false;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void createAppUserAndProfile(Long sysUserId) {
+        String randomDigits = generateSixDigitRandomNumber();
+        String username = "u_" + randomDigits;
+        String name = "u_" + randomDigits;
+        String appUserId = java.util.UUID.randomUUID().toString().replace("-", ""); // 生成32位UUID作为User和Profile的ID
+
+        // 插入User表
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(appUserId);
+        userDTO.setUsername(username);
+        userDTO.setSysUserId(sysUserId);
+        userService.save(userDTO);
+
+        // 插入Profile表
+        ProfileDTO profileDTO = new ProfileDTO();
+        profileDTO.setId(java.util.UUID.randomUUID().toString().replace("-", ""));
+        profileDTO.setUserId(appUserId);
+        profileDTO.setName(name);
+        profileService.save(profileDTO);
     }
 }
