@@ -38,7 +38,7 @@ const EditProfile = () => {
 
   const editProfileMutation = useMutation(
     ({ name, bio, website, dateOfBirth: dob }) => {
-      return axios.put('/api/users/my/profile', {
+      return axios.put('/api/users/me/profile', {
         name,
         bio,
         website,
@@ -197,19 +197,6 @@ const EditProfile = () => {
           <div className="flex justify-between gap-3 mb-4">
             <div className="w-1/2">
               <SelectInput
-                id="month"
-                name="month"
-                value={form.values.month}
-                label="月"
-                onFocus={form.handleFocus}
-                onBlur={form.handleBlur}
-                onChange={form.handleChange}
-                error={form.touched.month ? form.errors.month : ''}
-                options={DateOptions.months}
-              />
-            </div>
-            <div className="w-1/4">
-              <SelectInput
                 id="year"
                 name="year"
                 value={form.values.year}
@@ -219,6 +206,19 @@ const EditProfile = () => {
                 onChange={form.handleChange}
                 error={form.touched.year ? form.errors.year : ''}
                 options={DateOptions.getYearsInRange(DateOptions.year_range)}
+              />
+            </div>
+            <div className="w-1/4">
+              <SelectInput
+                id="month"
+                name="month"
+                value={form.values.month}
+                label="月"
+                onFocus={form.handleFocus}
+                onBlur={form.handleBlur}
+                onChange={form.handleChange}
+                error={form.touched.month ? form.errors.month : ''}
+                options={DateOptions.months}
               />
             </div>
             <div className="w-1/4">

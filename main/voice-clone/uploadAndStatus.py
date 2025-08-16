@@ -49,6 +49,6 @@ def encode_audio_file(file_path):
 if __name__ == "__main__":
     appid = "7820115171"
     token = "o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC-"
-    spk_id = "S_f35T4BkB1"
-    train(appid=appid, token=token, audio_path="./audios/yu_first_train.wav", spk_id=spk_id)
+    spk_id = "S_2Kgax3vB1"
+    train(appid=appid, token=token, audio_path="./audios/m_final.mp3", spk_id=spk_id)
     get_status(appid=appid, token=token, spk_id=spk_id)

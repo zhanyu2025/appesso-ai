@@ -20,6 +20,7 @@ const getUserByUsername = async (req, res, next) => {
       },
       select: {
         id: true,
+        sys_user_id: true,
         create_at: true,
         username: true,
         profile: true,
@@ -545,10 +546,18 @@ const getRepliesByUser = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   const { userId } = req;
   const { name, bio, website, dateOfBirth } = req.body;
+  const user = await prisma.User.findFirst({
+    where: {
+      sys_user_id: BigInt(userId),
+    },
+  });
+  if (!user) {
+    return res.status(404).json({ error: '用户不存在' });
+  }
   try {
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.User.update({
       where: {
-        id: userId,
+        id: user.id,
       },
       data: {
         profile: {
@@ -562,10 +571,8 @@ const updateProfile = async (req, res, next) => {
       },
       select: {
         id: true,
-        mobile: true,
         username: true,
-        provider: true,
-        createdAt: true,
+        sys_user_id: true,
         profile: true,
       },
     });

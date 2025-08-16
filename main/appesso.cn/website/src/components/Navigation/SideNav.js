@@ -288,7 +288,7 @@ const SideNav = () => {
                   <div className="h-10 w-10 overflow-hidden">
                     <img
                       className="h-full w-full rounded-full object-cover"
-                      src={user?.avatar ?? '/avatars/default.webp'}
+                      src={user.profile.image ?? '/avatars/default.webp'}
                       alt="avatar"
                     />
                   </div>

@@ -3,7 +3,7 @@ const router = require('express').Router();
 const { checkSchema } = require('express-validator');
 const userController = require('../controllers/user');
 const { isAuthenticated, validateRequest } = require('../middlewares/auth');
-const { validateUsername } = require('../services/validators');
+const { profileSchema, validateUsername } = require('../services/validators');
 
 router.get('/user/:username', userController.getUserByUsername);
 router.get('/me/devices', isAuthenticated, userController.getMyDevices);
@@ -13,13 +13,13 @@ router.get('/me/devices', isAuthenticated, userController.getMyDevices);
 // router.get('/:id/followers', isAuthenticated, userController.getFollowersList);
 // router.get('/:id/followees', isAuthenticated, userController.getFolloweesList);
 // router.get('/:id/posts/replies', userController.getRepliesByUser);
-// router.put(
-//   '/me/profile/',
-//   isAuthenticated,
-//   checkSchema(profileSchema),
-//   validateRequest,
-//   userController.updateProfile
-// );
+router.put(
+  '/me/profile/',
+  isAuthenticated,
+  checkSchema(profileSchema),
+  validateRequest,
+  userController.updateProfile
+);
 router.patch(
   '/me/username',
   isAuthenticated,

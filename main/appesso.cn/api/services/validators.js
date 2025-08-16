@@ -104,11 +104,10 @@ const profileSchema = {
   name: {
     trim: true,
     notEmpty: {
-      errorMessage: 'This is a mandatory field',
+      errorMessage: '姓名不能为空',
     },
     isLength: {
-      errorMessage:
-        'Name must be minimum 1 character and maximum 20 characters long',
+      errorMessage: '姓名必须至少1个字符，最多20个字符长',
       options: {
         min: 1,
         max: 20,
@@ -119,7 +118,7 @@ const profileSchema = {
   bio: {
     trim: true,
     isLength: {
-      errorMessage: 'Bio cannot be more than 255 characters',
+      errorMessage: '简介不能超过255个字符',
       options: {
         min: 0,
         max: 255,
@@ -131,7 +130,7 @@ const profileSchema = {
     trim: true,
     optional: { options: { checkFalsy: true } },
     isURL: {
-      errorMessage: 'Invalid website URL',
+      errorMessage: '网站地址无效',
       options: {
         protocols: ['http', 'https'],
       },
@@ -139,10 +138,10 @@ const profileSchema = {
   },
   dateOfBirth: {
     notEmpty: {
-      errorMessage: 'This is a mandatory field',
+      errorMessage: '出生日期不能为空',
     },
     isISO8601: {
-      errorMessage: 'Invalid Date',
+      errorMessage: '无效的日期格式',
       options: {
         strict: true,
       },

@@ -84,17 +84,17 @@ export const editProfileValidator = {
   validateForm: (values) => {
     const errors = {};
     if (!values.name.trim()) {
-      errors.name = 'This is a mandatory field';
+      errors.name = '姓名不能为空';
     } else if (values.name.length < 2) {
-      errors.name = 'Name cannot be less than 2 characters';
+      errors.name = '姓名不能少于2个字符';
     } else if (values.name.length > 100) {
-      errors.name = 'Name cannot be more than 100 characters';
+      errors.name = '姓名不能超过100个字符';
     }
     if (values.bio.trim().length > 255) {
-      errors.bio = 'Bio cannot be more than 255 characters';
+      errors.bio = '个人简介不能超过255个字符';
     }
     if (values.website.trim() && !validator.isURL(values.website)) {
-      errors.website = 'Invalid website URL';
+      errors.website = '网站地址无效';
     }
     if (!values.month.trim()) {
       errors.month = '请选择月份';

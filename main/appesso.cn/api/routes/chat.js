@@ -13,7 +13,7 @@ router.get('/all', isAuthenticated, chatController.getAllChatsOfUser);
 //   chatController.findOrCreateNewChat
 // );
 
-// router.get('/:id', isAuthenticated, chatController.getChatById);
+router.get('/:id', isAuthenticated, chatController.getChatById);
 
 // router.post(
 //   '/:id/message',

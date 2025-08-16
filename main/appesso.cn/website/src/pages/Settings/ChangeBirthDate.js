@@ -84,7 +84,7 @@ const ChangeBirthDate = () => {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/settings')}
             className="text-on-surface"
             title="back"
           >
@@ -111,7 +111,7 @@ const ChangeBirthDate = () => {
           onSubmit={form.handleSubmit}
         >
           <div className="flex justify-between gap-3 mb-4">
-            <div className="w-1/4">
+            <div className="w-1/2">
               <SelectInput
                 id="year"
                 name="year"
@@ -124,7 +124,7 @@ const ChangeBirthDate = () => {
                 options={DateOptions.getYearsInRange(DateOptions.year_range)}
               />
             </div>
-            <div className="w-1/2">
+            <div className="w-1/4">
               <SelectInput
                 id="month"
                 name="month"

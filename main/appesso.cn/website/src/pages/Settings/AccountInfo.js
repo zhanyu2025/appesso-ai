@@ -40,7 +40,7 @@ const AccountInfo = () => {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/settings')}
             className="text-on-surface"
             title="back"
           >
