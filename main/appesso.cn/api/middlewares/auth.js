@@ -66,7 +66,7 @@ const generateAuthTokens = async (req, res, next) => {
         create_date: true,
       },
     });
-
+    // eslint-disable-next-line no-console
     const user = await prisma.User.findFirst({
       where: { sys_user_id: BigInt(req.userId) },
       select: {

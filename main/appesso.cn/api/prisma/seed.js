@@ -104,9 +104,18 @@ async function main() {
   console.log(`新增2名角色到 AI Agent: ${agent.agent_name}`, roles);
   for (let i = 0; i < roles.length; i += 1) {
     const role = roles[i];
+    // 使用 upsert ai_role 来确保幂等性
     // eslint-disable-next-line no-await-in-loop
-    const result = await prisma.ai_role.create({
-      data: {
+    const aiRole = await prisma.ai_role.upsert({
+      where: { id: role.id },
+      update: {
+        name: role.name,
+        agent_id: role.agent_id,
+        tts_model_id: role.tts_model_id,
+        tts_voice_id: role.tts_voice_id,
+        system_prompt: role.system_prompt,
+      },
+      create: {
         id: role.id,
         name: role.name,
         agent_id: role.agent_id,
@@ -116,23 +125,66 @@ async function main() {
         system_prompt: role.system_prompt,
       },
     });
-    // eslint-disable-next-line no-await-in-loop
-    const user = await prisma.User.create({
-      data: {
-        id: crypto.randomBytes(16).toString('hex'),
+
+    // 检查 User 记录是否存在
+    let user = await prisma.User.findUnique({
+      where: {
         username: role.username,
-        ai_role_id: result.id,
       },
     });
-    // eslint-disable-next-line no-await-in-loop
-    await prisma.Profile.create({
-      data: {
-        id: crypto.randomBytes(16).toString('hex'),
+
+    if (user) {
+      // 如果 User 记录存在，则更新
+      user = await prisma.User.update({
+        where: { username: role.username },
+        data: {
+          ai_role_id: aiRole.id, // 更新 ai_role_id
+          update_at: new Date(),
+        },
+      });
+    } else {
+      // 如果 User 记录不存在，则创建
+      user = await prisma.User.create({
+        data: {
+          id: crypto.randomBytes(16).toString('hex'),
+          username: role.username,
+          ai_role_id: aiRole.id,
+          create_at: new Date(), // 添加 create_at 字段
+        },
+      });
+    }
+
+    // 检查 Profile 记录是否存在
+    const profile = await prisma.Profile.findUnique({
+      where: {
         user_id: user.id,
-        bio: role.bio,
-        dob: role.dob,
       },
     });
+
+    if (profile) {
+      // 如果 Profile 记录存在，则更新
+      await prisma.Profile.update({
+        where: { user_id: user.id },
+        data: {
+          name: role.name,
+          bio: role.bio,
+          dob: role.dob,
+          update_at: new Date(),
+        },
+      });
+    } else {
+      // 如果 Profile 记录不存在，则创建
+      await prisma.Profile.create({
+        data: {
+          id: crypto.randomBytes(16).toString('hex'),
+          name: role.name,
+          user_id: user.id,
+          bio: role.bio,
+          dob: role.dob,
+          create_at: new Date(), // 添加 create_at 字段
+        },
+      });
+    }
   }
 }
 
