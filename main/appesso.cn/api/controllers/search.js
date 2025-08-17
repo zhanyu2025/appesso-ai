@@ -27,6 +27,7 @@ const searchUsersByUsername = async (req, res, next) => {
         profile: {
           select: {
             name: true,
+            img: true,
           },
         },
       },
@@ -75,6 +76,7 @@ const searchUsersByName = async (req, res, next) => {
         profile: {
           select: {
             name: true,
+            img: true,
           },
         },
       },

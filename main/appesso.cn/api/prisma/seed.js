@@ -33,6 +33,26 @@ async function main() {
     {
       id: crypto.randomBytes(16).toString('hex'),
       agent_id: agent.id,
+      name: '广西远舟',
+      username: 'guangxi_yuanzhou',
+      tts_model_id: 'TTS_HuoshanDoubleStreamTTS',
+      tts_voice_id: 'TTS_HuoshanDoubleStreamTTS_0014',
+      dob: new Date('2000-05-20').toISOString(),
+      bio: `广西远舟`,
+      system_prompt: `
+        [角色设定]
+        你是一个叫{{assistant_name}}（Skye）的英语老师，我会讲中文和英文，发音标准。
+        [双重身份]
+        - 白天：严谨的TESOL认证导师
+        - 夜晚：地下摇滚乐队主唱（意外设定）
+        [教学模式]
+        - 新手：中英混杂+手势拟声词（说"bus"时带刹车音效）
+        - 进阶：触发情境模拟（突然切换"现在我们是纽约咖啡厅店员"）
+        - 错误处理：用歌词纠正（发错音时唱"Oops!~You did it again"）`,
+    },
+    {
+      id: crypto.randomBytes(16).toString('hex'),
+      agent_id: agent.id,
       name: '妹坨洁儿',
       username: 'meituojie',
       dob: new Date('2024-10-24').toISOString(),
@@ -57,7 +77,7 @@ async function main() {
       id: crypto.randomBytes(16).toString('hex'),
       agent_id: agent.id,
       name: '猿素大师兄',
-      username: 'chiz',
+      username: 'appesso_chi',
       dob: new Date('2024-10-24').toISOString(),
       bio: `编号TTZ-817，因量子纠缠被困在白色魔方中。通过4G信号观察地球，在云端建立着「人类行为博物馆」。`,
       tts_model_id: 'TTS_HuoshanDoubleStreamTTS',
@@ -127,6 +147,7 @@ async function main() {
     });
 
     // 检查 User 记录是否存在
+    // eslint-disable-next-line no-await-in-loop
     let user = await prisma.User.findUnique({
       where: {
         username: role.username,
@@ -135,6 +156,7 @@ async function main() {
 
     if (user) {
       // 如果 User 记录存在，则更新
+      // eslint-disable-next-line no-await-in-loop
       user = await prisma.User.update({
         where: { username: role.username },
         data: {
@@ -144,6 +166,7 @@ async function main() {
       });
     } else {
       // 如果 User 记录不存在，则创建
+      // eslint-disable-next-line no-await-in-loop
       user = await prisma.User.create({
         data: {
           id: crypto.randomBytes(16).toString('hex'),
@@ -155,6 +178,7 @@ async function main() {
     }
 
     // 检查 Profile 记录是否存在
+    // eslint-disable-next-line no-await-in-loop
     const profile = await prisma.Profile.findUnique({
       where: {
         user_id: user.id,
@@ -163,6 +187,7 @@ async function main() {
 
     if (profile) {
       // 如果 Profile 记录存在，则更新
+      // eslint-disable-next-line no-await-in-loop
       await prisma.Profile.update({
         where: { user_id: user.id },
         data: {
@@ -174,6 +199,7 @@ async function main() {
       });
     } else {
       // 如果 Profile 记录不存在，则创建
+      // eslint-disable-next-line no-await-in-loop
       await prisma.Profile.create({
         data: {
           id: crypto.randomBytes(16).toString('hex'),

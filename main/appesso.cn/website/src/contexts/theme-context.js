@@ -7,7 +7,7 @@ const initialState = {
     name: 'sky-blue',
     color: '#1d9bf0',
   },
-  theme: { name: 'dark', bgColor: '#000000', fgColor: '#e7e9ea' },
+  theme: { name: 'light', bgColor: '#ffffff', fgColor: '#0f1419' },
   primaryColors: [
     {
       name: 'sky-blue',
