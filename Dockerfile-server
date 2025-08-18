@@ -5,6 +5,9 @@ WORKDIR /app
 
 COPY main/xiaozhi-server/requirements.txt .
 
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ && \
+    pip config set global.trusted-host mirrors.aliyun.com
+
 # 安装Python依赖
 RUN pip install --no-cache-dir -r requirements.txt
 
