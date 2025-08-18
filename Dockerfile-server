@@ -16,17 +16,17 @@ FROM python:3.10-slim
 
 WORKDIR /opt/xiaozhi-esp32-server
 
-# 替换为国内apt镜像源（解决安装慢的问题）
-# 注意：根据基础镜像的发行版调整（此处基于debian bullseye）
-RUN echo "deb http://mirrors.aliyun.com/debian/ bullseye main non-free contrib" > /etc/apt/sources.list && \
-    echo "deb-src http://mirrors.aliyun.com/debian/ bullseye main non-free contrib" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.aliyun.com/debian-security/ bullseye-security main" >> /etc/apt/sources.list && \
-    echo "deb-src http://mirrors.aliyun.com/debian-security/ bullseye-security main" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.aliyun.com/debian/ bullseye-updates main non-free contrib" >> /etc/apt/sources.list && \
-    echo "deb-src http://mirrors.aliyun.com/debian/ bullseye-updates main non-free contrib" >> /etc/apt/sources.list
-
-# 安装系统依赖
-RUN apt-get update && \
+# 针对 Debian 11 (bullseye) 系统的腾讯云源配置
+RUN echo "deb http://mirrors.tencentyun.com/debian/ bullseye main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb http://mirrors.tencentyun.com/debian/ bullseye-updates main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb http://mirrors.tencentyun.com/debian-security/ bullseye-security main contrib non-free" >> /etc/apt/sources.list && \
+    # 禁用源码仓库（进一步加速）
+    # echo "deb-src http://mirrors.tencentyun.com/debian/ bullseye main contrib non-free" >> /etc/apt/sources.list && \
+    # 配置超时和重试
+    echo 'Acquire::http::Timeout "10";' > /etc/apt/apt.conf.d/99timeout && \
+    echo 'Acquire::Retries "3";' >> /etc/apt/apt.conf.d/99timeout && \
+    # 执行安装
+    apt-get update && \
     apt-get install -y --no-install-recommends libopus0 ffmpeg && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
