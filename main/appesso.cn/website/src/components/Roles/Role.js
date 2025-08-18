@@ -5,17 +5,16 @@ import { RiChat1Line, RiHeartFill, RiShareLine } from 'react-icons/ri';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import RadioButton from '../RadioButton';
 import { useTheme } from '../../contexts/theme-context';
 
-const Role = ({ role, devices, onSelect }) => {
+const Role = ({ role, devices, onSelect, selectedRoleId }) => {
   const { primaryColor, theme } = useTheme();
   const [isHovered, setIsHovered] = useState(false);
-  const isSelected = !devices
-    ? false
-    : devices?.some((device) =>
-        device?.roles?.some((item) => item.role_id === role.id)
-      );
+  const isSelected =
+    role.ai_role_id === selectedRoleId ||
+    devices?.some((device) =>
+      device?.roles?.some((item) => item.role_id === role.ai_role_id)
+    );
   // eslint-disable-next-line no-nested-ternary
   const backgroundColor = isSelected
     ? `${primaryColor.color}20`
@@ -30,7 +29,6 @@ const Role = ({ role, devices, onSelect }) => {
     : '1px solid rgba(231, 233, 234)';
   return (
     <div
-      key={role.id}
       className="flex flex-col flex-1 py-5 rounded-xl px-3 gap-5 items-center justify-between cursor-pointer disabled:cursor-not-allowed"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -98,20 +96,13 @@ const Role = ({ role, devices, onSelect }) => {
               </g>
             </svg>
           ) : (
-            <RadioButton
-              id={role.username}
-              name="role"
-              value={role.username}
-              bgColor={isSelected ? primaryColor.color : 'transparent'}
-              fgColor="#fff"
-              selected={isSelected}
-              size="20px"
+            <button
+              type="button"
               disabled={isSelected}
-              borderColor={isSelected ? 'transparent' : `${theme.fgColor}4d`}
-              radioBtnChangeHandler={() =>
-                isSelected ? null : onSelect(role.id)
-              }
-            />
+              onClick={() => onSelect(role.ai_role_id)}
+            >
+              跟Ta聊天
+            </button>
           )}
         </div>
         <p className="text-sm text-on-surface/70 text-pretty line-clamp-3">
@@ -179,6 +170,7 @@ Role.propTypes = {
       dob: PropTypes.string,
     }),
   }).isRequired,
+  selectedRoleId: PropTypes.string.isRequired,
   onSelect: PropTypes.func,
   devices: PropTypes.arrayOf(
     PropTypes.shape({

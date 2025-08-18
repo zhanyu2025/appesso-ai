@@ -164,7 +164,7 @@ const getChatById = async (req, res, next) => {
         mac_address: device.id,
       },
       orderBy: {
-        created_at: 'desc',
+        created_at: 'asc',
       },
     });
 

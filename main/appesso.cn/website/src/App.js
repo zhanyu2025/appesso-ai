@@ -50,8 +50,10 @@ import FollowersList from './components/FollowersList';
 import AddPostHeader from './components/AddPostHeader';
 
 import useMediaQuery from './hooks/useMediaQuery';
+import useSelectedRoleId from './hooks/useSelectedRoleId';
 
 const App = () => {
+  const [_, setSelectedRoleId] = useSelectedRoleId();
   const { login, isAuthenticated, expiresAt, logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -114,7 +116,18 @@ const App = () => {
     expiresAt,
     // exclude mutations - because verifyToken is an unstable refrence and linter prevents listing only mutation function
   ]);
-
+  const handleDeviceActivationDismiss = () => {
+    setSelectedRoleId('');
+    navigate(`${state.backgroundLocation.pathname}`, {
+      replace: true,
+    });
+  };
+  const handleSignInDismiss = () => {
+    setSelectedRoleId('');
+    navigate(`${state.backgroundLocation.pathname}`, {
+      replace: true,
+    });
+  };
   useEffect(() => {
     if (socket) {
       socket.on('new notification', () => {
@@ -329,20 +342,8 @@ const App = () => {
               <Modal
                 isOpen
                 closeButtonVisible={false}
-                onDismiss={() =>
-                  navigate(`${state.backgroundLocation.pathname}`, {
-                    replace: true,
-                  })
-                }
-                customHeader={
-                  <AddPostHeader
-                    onDismiss={() =>
-                      navigate(`${state.backgroundLocation.pathname}`, {
-                        replace: true,
-                      })
-                    }
-                  />
-                }
+                onDismiss={handleSignInDismiss}
+                customHeader={<AddPostHeader onDismiss={handleSignInDismiss} />}
               >
                 <SigninForm />
               </Modal>
@@ -359,11 +360,7 @@ const App = () => {
                 <Modal
                   isOpen
                   closeButtonVisible={false}
-                  onDismiss={() =>
-                    navigate(`${state.backgroundLocation.pathname}`, {
-                      replace: true,
-                    })
-                  }
+                  onDismiss={handleDeviceActivationDismiss}
                   customHeader={
                     <AddPostHeader
                       onDismiss={() =>

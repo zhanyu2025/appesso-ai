@@ -153,6 +153,7 @@ public class ConfigServiceImpl implements ConfigService {
                 systemPrompt = role.getSystemPrompt();
                 ttsModelId = role.getTtsModelId();
                 // 获取音色信息 (根据 role 的 ttsVoiceId)
+                ttsVoice = role.getTtsVoiceId();
                 TimbreDetailsVO timbre = timbreService.get(role.getTtsVoiceId());
                 if (timbre != null) {
                     ttsVoice = timbre.getTtsVoice();
@@ -238,6 +239,8 @@ public class ConfigServiceImpl implements ConfigService {
                 true); // isCache
 
         System.out.println("ttsModelId: " + ttsModelId); // 添加打印语句
+        System.out.println("ttsVoice: " + ttsVoice); // 添加打印语句
+        System.out.println("result: " + result); // 添加打印语句
 
         return result;
     }

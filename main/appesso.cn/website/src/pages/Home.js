@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import PageHeader from '../components/PageHeader';
@@ -11,13 +11,14 @@ import Roles from '../components/Roles/Roles';
 const Home = () => {
   useScrollToTop();
   const { setPageTitle } = usePageTitle('首页 / 猿星球');
-  const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  // 派生状态，而不是维护一个独立的 state
+  // 当 location.state 中有 backgroundLocation 时，说明模态框是打开的
+  const modalOpen = !!location.state?.backgroundLocation;
 
   const openModal = useCallback(
     (path) => {
-      setModalOpen(true);
       navigate(path, {
         state: {
           backgroundLocation: location,
@@ -30,7 +31,6 @@ const Home = () => {
 
   useEffect(() => {
     if (location.pathname === '/home') {
-      setModalOpen(false);
       setPageTitle('首页 / 猿星球');
     }
   }, [location.pathname, setPageTitle]);

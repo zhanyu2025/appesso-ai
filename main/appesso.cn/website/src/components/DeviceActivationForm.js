@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useMutation } from 'react-query';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import TextInput from './TextInput';
 import Button from './Button';
@@ -12,11 +12,19 @@ import usePageTitle from '../hooks/usePageTitle';
 
 const DeviceActivationForm = () => {
   usePageTitle('设备激活 / 猿星球');
+  const location = useLocation();
   const navigate = useNavigate();
   const autoSubmitTimeoutRef = useRef(null);
 
-  const mutation = useMutation(({ code }) => {
-    return axios.post(`/api/devices/${code}/activation`);
+  // 使用 useMemo 解析 URL search params 以避免每次渲染都重新计算
+  const roleId = useMemo(
+    () => new URLSearchParams(location.search).get('roleId'),
+    [location.search]
+  );
+
+  const mutation = useMutation(({ code, roleId: rId }) => {
+    // 将 roleId 添加到请求体中
+    return axios.post(`/api/devices/${code}/activation`, { roleId: rId });
   });
 
   const validate = useCallback((values) => {
@@ -38,6 +46,7 @@ const DeviceActivationForm = () => {
       mutation.mutate(
         {
           code: values.code,
+          roleId, // 在提交时传递 roleId
         },
         {
           onSuccess: (response) => {
@@ -68,14 +77,14 @@ const DeviceActivationForm = () => {
             设备激活
           </h3>
           <p className="text-on-background/70 text-base mb-8">
-            请输入设备播报的6位数验证码
+            请输入设备播报的6位数激活码
           </p>
           <form onSubmit={form.handleSubmit}>
             <div className="relative mb-4">
               <TextInput
                 id="code"
                 name="code"
-                label="验证码"
+                label="激活码"
                 value={form.values.code}
                 error={form.touched.code ? form.errors.code : ''}
                 onFocus={form.handleFocus}
@@ -83,28 +92,26 @@ const DeviceActivationForm = () => {
                 onChange={(e) => {
                   form.handleChange(e);
 
-                  // Clear any existing timeout
+                  // 清除任何现有的超时
                   if (autoSubmitTimeoutRef.current) {
                     clearTimeout(autoSubmitTimeoutRef.current);
                   }
 
-                  // Auto-submit if we have exactly 11 digits
+                  // 如果输入刚好是6位数字，则自动提交
                   if (
                     e.target.value.length === 6 &&
                     /^\d{6}$/.test(e.target.value)
                   ) {
-                    // console.log('Auto-submit triggered for:', e.target.value);
-                    // Small delay to ensure form state is updated
+                    // 设置一个小的延迟以确保表单状态已更新
                     autoSubmitTimeoutRef.current = setTimeout(() => {
-                      // Double-check validation before submitting
+                      // 提交前再次检查验证
                       const errors = validate({ code: e.target.value });
-                      // console.log('Validation errors:', errors);
                       if (Object.keys(errors).length === 0) {
-                        // console.log('Submitting form automatically');
-                        // Manually trigger the form submission by calling the mutation directly
+                        // 直接调用 mutation 来手动触发提交
                         mutation.mutate(
                           {
                             code: e.target.value,
+                            roleId, // 在自动提交时也传递 roleId
                           },
                           {
                             onSuccess: (response) => {

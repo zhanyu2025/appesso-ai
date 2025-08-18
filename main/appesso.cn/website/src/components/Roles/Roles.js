@@ -5,9 +5,11 @@ import { Fragment } from 'react';
 import axios from '../../utils/axios';
 import Role from './Role';
 import Spinner from '../Spinner';
+import useSelectedRoleId from '../../hooks/useSelectedRoleId';
 import { useAuth } from '../../contexts/auth-context';
 
 const Roles = ({ handleModalOpen }) => {
+  const [selectedRoleId, setSelectedRoleId] = useSelectedRoleId();
   const { isAuthenticated } = useAuth();
   const rolesQuery = useQuery(
     ['roles'],
@@ -51,7 +53,6 @@ const Roles = ({ handleModalOpen }) => {
   const handleRoleSelect = (id) => {
     if (!isAuthenticated) {
       handleModalOpen('/signin');
-      return;
     }
     if (!devicesQuery.data) {
       return;
@@ -78,8 +79,9 @@ const Roles = ({ handleModalOpen }) => {
             <Role
               role={role}
               key={role.id}
+              selectedRoleId={selectedRoleId}
               devices={devicesQuery?.data ?? []}
-              onSelect={(id) => handleRoleSelect(id)}
+              onSelect={handleRoleSelect}
             />
           </Fragment>
         );

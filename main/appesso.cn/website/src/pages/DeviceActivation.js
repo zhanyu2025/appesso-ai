@@ -22,9 +22,9 @@ const DeviceActivation = () => {
   const validate = useCallback((values) => {
     const errors = {};
     if (!values.code) {
-      errors.code = '验证码不能为空';
+      errors.code = '激活码不能为空';
     } else if (!/^\d{6}$/.test(values.code)) {
-      errors.code = '验证码必须是6位数字';
+      errors.code = '激活码必须是6位数字';
     }
     return errors;
   }, []);
@@ -68,14 +68,14 @@ const DeviceActivation = () => {
             设备激活
           </h3>
           <p className="text-on-background/70 text-base mb-8">
-            请输入设备播报的6位数验证码
+            请输入设备播报的6位数激活码
           </p>
           <form onSubmit={form.handleSubmit}>
             <div className="relative mb-4">
               <TextInput
                 id="code"
                 name="code"
-                label="验证码"
+                label="激活码"
                 value={form.values.code}
                 error={form.touched.code ? form.errors.code : ''}
                 onFocus={form.handleFocus}
