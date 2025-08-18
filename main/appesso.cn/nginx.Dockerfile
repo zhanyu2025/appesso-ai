@@ -23,6 +23,7 @@ COPY --from=builder /app/build /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY .htpasswd /etc/nginx/.htpasswd
 
 # Expose port 80
 EXPOSE 80

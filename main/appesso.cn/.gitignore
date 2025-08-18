@@ -9,6 +9,7 @@ website/.env.*
 client/node_modules
 client/.env
 
+.htpasswd
 # Environment files
 .env
 .env.*
