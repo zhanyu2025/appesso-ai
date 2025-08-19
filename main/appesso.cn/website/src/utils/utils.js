@@ -1,10 +1,3 @@
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}
-
 const checkIfEmpty = (obj) => {
   if (obj && Object.keys(obj).length === 0) {
     return true;

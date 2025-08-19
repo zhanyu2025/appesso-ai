@@ -7,7 +7,6 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './contexts/auth-context';
-import { SocketProvider } from './contexts/socket-context';
 import { ThemeProvider } from './contexts/theme-context';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -19,9 +18,7 @@ root.render(
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <AuthProvider>
-            <SocketProvider>
-              <App />
-            </SocketProvider>
+            <App />
           </AuthProvider>
         </ThemeProvider>
         <ReactQueryDevtools initialIsOpen={false} position="top-right" />

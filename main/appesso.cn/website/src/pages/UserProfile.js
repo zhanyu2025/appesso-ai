@@ -1,18 +1,8 @@
 /* eslint-disable react/jsx-no-constructed-context-values */
 import { useEffect, useCallback } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
-import {
-  Outlet,
-  NavLink,
-  useParams,
-  Link,
-  useNavigate,
-  useLocation,
-} from 'react-router-dom';
-import { RiCalendar2Line, RiMailLine, RiLinksLine } from 'react-icons/ri';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { RiCalendar2Line, RiLinksLine } from 'react-icons/ri';
 import { IconContext } from 'react-icons';
-
-import axios from '../utils/axios';
 
 import Spinner from '../components/Spinner';
 import NoMatch from './NoMatch';
@@ -22,14 +12,11 @@ import useScrollToTop from '../hooks/useScrollToTop';
 import usePageTitle from '../hooks/usePageTitle';
 
 import { useAuth } from '../contexts/auth-context';
-import { useSocket } from '../contexts/socket-context';
 
 const UserProfile = () => {
   useScrollToTop();
   const { username } = useParams();
   const { isAuthenticated, user: authUser } = useAuth();
-  const socket = useSocket();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
   const { setPageTitle } = usePageTitle();

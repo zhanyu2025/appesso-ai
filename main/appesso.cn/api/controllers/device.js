@@ -16,7 +16,7 @@ const redisClient = new Redis({
 redisClient.on('error', (err) => {
   // 在生产环境中，应该使用适当的日志库（如Winston, Pino等）来记录Redis客户端错误，
   // 而不是直接使用console.error。此处根据之前的反馈避免直接输出console。
-  // console.error('Redis客户端错误:', err);
+  console.error('Redis客户端错误:', err);
 });
 
 /**

@@ -7,12 +7,11 @@ import {
   useNavigate,
   matchPath,
 } from 'react-router-dom';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation } from 'react-query';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
 import { useAuth } from './contexts/auth-context';
-import { useSocket } from './contexts/socket-context';
 import useScrollToTop from './hooks/useScrollToTop';
 
 import { STATUS } from './utils/utils';
@@ -23,10 +22,7 @@ import Signin from './pages/Signin';
 
 import UserProfile from './pages/UserProfile';
 import DeviceActivation from './pages/DeviceActivation';
-import Follow from './pages/Follow';
 import NoMatch from './pages/NoMatch';
-import PostDetail from './pages/PostDetail';
-import Notifications from './pages/Notifications';
 import Messages from './pages/Messages';
 import Chat from './pages/Chat';
 import Search from './pages/Search';
@@ -41,29 +37,20 @@ import Layout from './components/Layout';
 import SplashScreen from './components/SplashScreen';
 import Modal from './components/Modal';
 import SigninForm from './components/SigninForm';
-import UserPosts from './components/Posts/UserPosts';
 import DeviceActivationForm from './components/DeviceActivationForm';
-import PostsAndReplies from './components/Posts/PostsAndReplies';
-import LikedPosts from './components/Posts/LikedPosts';
-import FolloweesList from './components/FolloweesList';
-import FollowersList from './components/FollowersList';
 import AddPostHeader from './components/AddPostHeader';
 
 import useMediaQuery from './hooks/useMediaQuery';
 import useSelectedRoleId from './hooks/useSelectedRoleId';
 
 const App = () => {
-  const [_, setSelectedRoleId] = useSelectedRoleId();
-  const { login, isAuthenticated, expiresAt, logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const socket = useSocket();
-  const queryClient = useQueryClient();
+  const [_, setSelectedRoleId] = useSelectedRoleId();
+  const { login, isAuthenticated, expiresAt, logout, user } = useAuth();
   const isWidthGreaterThan640 = useMediaQuery('(min-width: 640px)');
-  const { state } = location;
-
   useScrollToTop();
-
+  const { state } = location;
   const verifyToken = useMutation(
     () => {
       return axios.post(
@@ -128,17 +115,6 @@ const App = () => {
       replace: true,
     });
   };
-  useEffect(() => {
-    if (socket) {
-      socket.on('new notification', () => {
-        queryClient.invalidateQueries('notifications');
-      });
-      socket.on('new message', ({ chatId }) => {
-        queryClient.invalidateQueries(['chat', chatId]);
-        queryClient.invalidateQueries('messages');
-      });
-    }
-  }, [socket, queryClient]);
 
   return (
     <div>
@@ -151,14 +127,6 @@ const App = () => {
             element={
               <RequireAuth redirectTo="/signin">
                 <Search />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="notifications"
-            element={
-              <RequireAuth redirectTo="/signin">
-                <Notifications />
               </RequireAuth>
             }
           />
@@ -250,67 +218,6 @@ const App = () => {
             element={
               <RequireAuth redirectTo="/signin">
                 <UserProfile />
-              </RequireAuth>
-            }
-          >
-            <Route
-              index
-              element={
-                <RequireAuth redirectTo="/signin">
-                  <UserPosts />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="posts"
-              element={
-                <RequireAuth redirectTo="/signin">
-                  <UserPosts />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="with_replies"
-              element={
-                <RequireAuth redirectTo="/signin">
-                  <PostsAndReplies />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="likes"
-              element={
-                <RequireAuth redirectTo="/signin">
-                  <LikedPosts />
-                </RequireAuth>
-              }
-            />
-          </Route>
-          <Route
-            path="/:username/post/:postId"
-            element={<PostDetail key={location.pathname} />}
-          />
-          <Route
-            path="/:username/list"
-            element={
-              <RequireAuth redirectTo="/signin">
-                <Follow />
-              </RequireAuth>
-            }
-          >
-            <Route path="followers" element={<FollowersList />} />
-            <Route path="following" element={<FolloweesList />} />
-          </Route>
-          <Route
-            path="compose/post"
-            element={
-              <RequireAuth redirectTo="/signin">
-                <Navigate
-                  to="/home"
-                  state={{
-                    from: location,
-                  }}
-                />
               </RequireAuth>
             }
           />

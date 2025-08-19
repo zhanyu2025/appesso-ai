@@ -3,7 +3,6 @@ require('dotenv').config();
 
 const app = require('./app');
 const { PORT } = require('./utils/config');
-const { setupSocketServer } = require('./socket-io');
 
 const server = http.createServer(app);
 
@@ -15,5 +14,3 @@ server.listen(port, host, () => {
   console.log(`🌐 环境: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 健康检查: http://${host}:${port}/api/health`);
 });
-
-setupSocketServer(server);
