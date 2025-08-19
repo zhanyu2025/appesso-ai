@@ -2,6 +2,7 @@ import time
 import os
 import sys
 import io
+import json
 import psutil
 from config.logger import setup_logging
 from typing import Optional, Tuple, List
@@ -46,6 +47,9 @@ class ASRProvider(ASRProviderBase):
             logger.bind(tag=TAG).error(f"可用内存不足2G，当前仅有 {total_mem / (1024*1024):.2f} MB，可能无法启动FunASR")
 
         print("ASRProvider config")
+        logger.bind(tag=TAG).debug(
+            f"ASRProvider config: {json.dumps(config, ensure_ascii=False)}"
+        )
         self.interface_type = InterfaceType.LOCAL
         self.model_dir = config.get("model_dir")
         self.output_dir = config.get("output_dir")  # 修正配置键名
