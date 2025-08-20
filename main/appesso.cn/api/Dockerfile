@@ -1,6 +1,8 @@
-FROM node:18-slim
-RUN apt-get update
-RUN apt-get install -y openssl
+# api/Dockerfile.prod
+FROM node:18-alpine
+
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
@@ -20,4 +22,4 @@ RUN npx prisma generate
 EXPOSE 5000
 
 # The command to run the application
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]

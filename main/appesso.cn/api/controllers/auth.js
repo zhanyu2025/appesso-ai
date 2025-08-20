@@ -8,24 +8,16 @@ const { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_LIFE } = require('../utils/config');
 const loginMobile = async (req, res, next) => {
   const { mobile } = req.body;
   try {
-    let user = await prisma.sys_user.findUnique({
+    const user = await prisma.sys_user.findUnique({
       where: {
         username: mobile,
       },
     });
     if (!user) {
-      user = await prisma.sys_user.create({
-        data: {
-          username: mobile,
-        },
-        select: {
-          id: true,
-          username: true,
-          create_date: true,
-        },
-      });
+      const error =
+        createError.Unauthorized('账号不存在，请联系管理员开通账号。');
+      throw error;
     }
-
     req.userId = user.id;
     return next();
   } catch (error) {
@@ -69,7 +61,7 @@ const verifyAndGenerateAccessToken = async (req, res, next) => {
       });
       if (!sysUser || !user) {
         await clearTokens(req, res);
-        const error = createError('Invalid credentials', 401);
+        const error = createError.Unauthorized('Invalid credentials。');
         throw error;
       }
       const accessToken = generateJWT(

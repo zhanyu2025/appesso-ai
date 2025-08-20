@@ -79,7 +79,7 @@ const Signin = () => {
             欢迎来到猿星球
           </h3>
           <p className="text-on-background/70 text-base mb-8">
-            猿星球使用手机号快速登录，无需复杂注册流程
+            输入手机号快速开始使用
           </p>
           <form onSubmit={form.handleSubmit}>
             <div className="relative mb-4">
@@ -167,11 +167,6 @@ const Signin = () => {
               </Button>
             </div>
           </form>
-          <div className="mt-4">
-            <p className="text-on-background/60 text-sm">
-              输入手机号即可登录或自动注册
-            </p>
-          </div>
         </div>
       </div>
     </div>
