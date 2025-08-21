@@ -6,7 +6,7 @@ import PageHeader from '../components/PageHeader';
 import usePageTitle from '../hooks/usePageTitle';
 import useScrollToTop from '../hooks/useScrollToTop';
 
-import Roles from '../components/Roles/Roles';
+import FeaturedUsers from '../components/Users/FeaturedUsers';
 
 const Home = () => {
   useScrollToTop();
@@ -53,7 +53,7 @@ const Home = () => {
       <div className="sticky top-0 left-0 w-full z-[100]">
         <PageHeader title="首页" />
       </div>
-      <Roles handleModalOpen={openModal} />
+      <FeaturedUsers handleModalOpen={openModal} />
     </div>
   );
 };

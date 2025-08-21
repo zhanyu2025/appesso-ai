@@ -7,10 +7,8 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 
 const authRoutes = require('./routes/auth');
-const rolesRoutes = require('./routes/role');
 const usersRoutes = require('./routes/user');
 const chatRoutes = require('./routes/chat');
-const deviceRoutes = require('./routes/device');
 const searchRoutes = require('./routes/search');
 
 const { errorLogger, errorResponder } = require('./middlewares/error-handler');
@@ -64,10 +62,8 @@ if (!isDev) {
 }
 
 app.use('/api/auth', authRoutes);
-app.use('/api/roles', rolesRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/chat', chatRoutes);
-app.use('/api/devices', deviceRoutes);
 app.use('/api/search', searchRoutes);
 
 // Serve React app for non-API routes in production

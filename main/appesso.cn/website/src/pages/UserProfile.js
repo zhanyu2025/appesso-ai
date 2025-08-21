@@ -62,7 +62,7 @@ const UserProfile = () => {
         <div className="flex justify-between mt-2">
           <div className="w-24 h-24 rounded-full overflow-hidden -mt-14">
             <img
-              src={user.profile?.img ?? '/avatars/default.webp'}
+              src={user.profile?.img || '/avatars/default.webp'}
               alt="User avatar"
               className="w-full h-full object-cover"
             />

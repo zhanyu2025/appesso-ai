@@ -71,18 +71,18 @@ model ai_agent_chat_audio {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model ai_agent_chat_history {
-  id          BigInt   @id @default(autoincrement())
-  mac_address String?  @db.VarChar(50)
-  agent_id    String?  @db.VarChar(32)
-  role_id     String?  @db.VarChar(32)
-  session_id  String?  @db.VarChar(50)
-  chat_type   Int?     @db.TinyInt
-  content     String?  @db.VarChar(1024)
-  audio_id    String?  @db.VarChar(32)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @default(now())
+  id             BigInt   @id @default(autoincrement())
+  mac_address    String?  @db.VarChar(50)
+  agent_id       String?  @db.VarChar(32)
+  session_id     String?  @db.VarChar(50)
+  chat_type      Int?     @db.TinyInt
+  content        String?  @db.VarChar(1024)
+  audio_id       String?  @db.VarChar(32)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now())
+  user_id        String   @db.VarChar(32)
+  participant_id String   @db.VarChar(32)
 
-  @@index([role_id], map: "idx_ai_agent_chat_history_role_id")
   @@index([agent_id], map: "idx_ai_agent_chat_history_agent_id")
   @@index([agent_id, session_id, created_at], map: "idx_ai_agent_chat_history_agent_session_created")
   @@index([mac_address], map: "idx_ai_agent_chat_history_mac")
@@ -153,6 +153,8 @@ model ai_device {
   create_date       DateTime? @db.DateTime(0)
   updater           BigInt?
   update_date       DateTime? @db.DateTime(0)
+  ownerId           String?   @db.VarChar(32)
+  chatUserId        String?   @db.VarChar(32)
 
   @@index([mac_address], map: "idx_ai_device_created_at")
 }
@@ -316,67 +318,28 @@ model sys_user_token {
   sys_user    sys_user? @relation(fields: [user_id], references: [id])
 }
 
-model ai_role {
-  id            String    @id @db.VarChar(32)
-  agent_id      String    @db.VarChar(32)
-  name          String    @db.VarChar(64)
-  tts_model_id  String    @db.VarChar(32)
-  tts_voice_id  String    @db.VarChar(32)
-  system_prompt String    @db.Text
-  create_date   DateTime  @db.DateTime(0)
-  update_date   DateTime? @db.DateTime(0)
-  likes         Like[]
-  messages      Message[]
-}
-
-model ai_device_role {
-  id          String    @id @db.VarChar(32)
-  role_id     String    @db.VarChar(32)
-  device_id   String    @db.VarChar(32)
-  create_date DateTime  @db.DateTime(0)
-  update_date DateTime? @db.DateTime(0)
-}
-
 model User {
   id          String    @id @unique @db.VarChar(32)
   username    String    @unique @db.VarChar(50)
   profile     Profile?
   sys_user_id BigInt?
-  ai_role_id  String?   @db.VarChar(32)
+  featured    Boolean   @default(false)
   create_at   DateTime  @default(now()) @db.DateTime(0)
   update_at   DateTime? @db.DateTime(0)
-  likes       Like[]
-  Message     Message[]
-}
-
-model Like {
-  id         Int      @id @default(autoincrement())
-  ai_role    ai_role? @relation(fields: [ai_roleId], references: [id])
-  ai_roleId  String?  @db.VarChar(32)
-  user       User?    @relation(fields: [userId], references: [id])
-  userId     String?  @db.VarChar(32)
-  created_at DateTime @default(now()) @db.DateTime(0)
-}
-
-model Message {
-  id         Int      @id @default(autoincrement())
-  content    String   @db.VarChar(4000)
-  user       User?    @relation(fields: [userId], references: [id])
-  userId     String?  @db.VarChar(32)
-  ai_role    ai_role? @relation(fields: [ai_roleId], references: [id])
-  ai_roleId  String?  @db.VarChar(32)
-  created_at DateTime @default(now()) @db.DateTime(0)
 }
 
 model Profile {
-  id        String    @id @unique @db.VarChar(32)
-  user_id   String    @unique @db.VarChar(32)
-  name      String    @db.VarChar(50)
-  img       String?   @db.VarChar(4000)
-  website   String?   @db.VarChar(100)
-  create_at DateTime  @default(now()) @db.DateTime(0)
-  update_at DateTime? @db.DateTime(0)
-  user      User?     @relation(fields: [user_id], references: [id])
-  bio       String?   @db.VarChar(255)
-  dob       DateTime?
+  id            String    @id @unique @db.VarChar(32)
+  user_id       String    @unique @db.VarChar(32)
+  name          String    @db.VarChar(50)
+  img           String?   @db.VarChar(4000)
+  website       String?   @db.VarChar(100)
+  create_at     DateTime  @default(now()) @db.DateTime(0)
+  update_at     DateTime? @db.DateTime(0)
+  tts_model_id  String?   @db.VarChar(32)
+  tts_voice_id  String?   @db.VarChar(32)
+  system_prompt String?   @db.Text
+  user          User?     @relation(fields: [user_id], references: [id])
+  bio           String?   @db.VarChar(255)
+  dob           DateTime?
 }

@@ -17,14 +17,13 @@ const DeviceActivationForm = () => {
   const autoSubmitTimeoutRef = useRef(null);
 
   // 使用 useMemo 解析 URL search params 以避免每次渲染都重新计算
-  const roleId = useMemo(
-    () => new URLSearchParams(location.search).get('roleId'),
+  const userId = useMemo(
+    () => new URLSearchParams(location.search).get('userId'),
     [location.search]
   );
 
-  const mutation = useMutation(({ code, roleId: rId }) => {
-    // 将 roleId 添加到请求体中
-    return axios.post(`/api/devices/${code}/activation`, { roleId: rId });
+  const mutation = useMutation(({ code, chatUserId }) => {
+    return axios.post(`/api/devices/activation`, { code, chatUserId });
   });
 
   const validate = useCallback((values) => {
@@ -46,7 +45,7 @@ const DeviceActivationForm = () => {
       mutation.mutate(
         {
           code: values.code,
-          roleId, // 在提交时传递 roleId
+          chatUserId: userId, // 在提交时传递 userId
         },
         {
           onSuccess: (response) => {
@@ -111,7 +110,7 @@ const DeviceActivationForm = () => {
                         mutation.mutate(
                           {
                             code: e.target.value,
-                            roleId, // 在自动提交时也传递 roleId
+                            chatUserId: userId, // 在自动提交时也传递 userId
                           },
                           {
                             onSuccess: (response) => {

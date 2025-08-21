@@ -41,12 +41,12 @@ import DeviceActivationForm from './components/DeviceActivationForm';
 import AddPostHeader from './components/AddPostHeader';
 
 import useMediaQuery from './hooks/useMediaQuery';
-import useSelectedRoleId from './hooks/useSelectedRoleId';
+import useSelectedUserId from './hooks/useSelectedUserId';
 
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [_, setSelectedRoleId] = useSelectedRoleId();
+  const [_, setSelectedUserId] = useSelectedUserId();
   const { login, isAuthenticated, expiresAt, logout, user } = useAuth();
   const isWidthGreaterThan640 = useMediaQuery('(min-width: 640px)');
   useScrollToTop();
@@ -104,13 +104,13 @@ const App = () => {
     // exclude mutations - because verifyToken is an unstable refrence and linter prevents listing only mutation function
   ]);
   const handleDeviceActivationDismiss = () => {
-    setSelectedRoleId('');
+    setSelectedUserId('');
     navigate(`${state.backgroundLocation.pathname}`, {
       replace: true,
     });
   };
   const handleSignInDismiss = () => {
-    setSelectedRoleId('');
+    setSelectedUserId('');
     navigate(`${state.backgroundLocation.pathname}`, {
       replace: true,
     });
