@@ -5,6 +5,10 @@ const prisma = require('../services/connect-db');
 const { clearTokens, generateJWT } = require('../utils/auth');
 const { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_LIFE } = require('../utils/config');
 
+const sendMobileCode = async (req, res, next) => {
+  const { mobile } = req.body;
+};
+
 const loginMobile = async (req, res, next) => {
   const { mobile } = req.body;
   try {
@@ -93,7 +97,8 @@ const logout = async (req, res, next) => {
 };
 
 module.exports = {
-  loginMobile,
-  verifyAndGenerateAccessToken,
   logout,
+  loginMobile,
+  sendMobileCode,
+  verifyAndGenerateAccessToken,
 };

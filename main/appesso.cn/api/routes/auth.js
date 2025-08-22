@@ -8,10 +8,18 @@ const {
   isAuthenticated,
 } = require('../middlewares/auth');
 const {
+  mobileSchema,
   mobileLoginSchema, // New schema for mobile login
 } = require('../services/validators');
 
 const router = express.Router();
+
+router.post(
+  '/mobile/codes', // Changed route for mobile login
+  checkSchema(mobileSchema), // Using new mobile login schema
+  validateRequest,
+  authController.sendMobileCode // Assuming this new controller method will be created
+);
 
 router.post(
   '/login/mobile', // Changed route for mobile login

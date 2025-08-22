@@ -1,3 +1,16 @@
+const mobileSchema = {
+  mobile: {
+    trim: true,
+    notEmpty: {
+      errorMessage: '手机号码不能为空',
+    },
+    matches: {
+      options: [/^\d{11}$/],
+      errorMessage: '手机号码必须是11位数字',
+    },
+  },
+};
+
 const mobileLoginSchema = {
   mobile: {
     trim: true,
@@ -7,6 +20,16 @@ const mobileLoginSchema = {
     matches: {
       options: [/^\d{11}$/],
       errorMessage: '手机号码必须是11位数字',
+    },
+  },
+  code: {
+    trim: true,
+    notEmpty: {
+      errorMessage: '验证码不能为空',
+    },
+    matches: {
+      options: [/^\d{6}$/],
+      errorMessage: '验证码必须是6位数字',
     },
   },
 };
@@ -150,9 +173,10 @@ const profileSchema = {
 };
 
 module.exports = {
-  mobileLoginSchema,
   postSchema,
   chatSchema,
+  mobileSchema,
+  mobileLoginSchema,
   messageSchema,
   profileSchema,
   validateUsername,
