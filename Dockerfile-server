@@ -17,12 +17,12 @@ FROM python:3.10-slim
 WORKDIR /opt/xiaozhi-esp32-server
 
 # 更换为腾讯云Ubuntu镜像源
-RUN sed -i 's/archive.ubuntu.com/mirrors.tencent.com/g' /etc/apt/sources.list && \
-    sed -i 's/security.ubuntu.com/mirrors.tencent.com/g' /etc/apt/sources.list && \
+RUN echo "deb http://mirrors.tencent.com/ubuntu/ jammy main restricted universe multiverse" > /etc/apt/sources.list && \
+    echo "deb http://mirrors.tencent.com/ubuntu/ jammy-security main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb http://mirrors.tencent.com/ubuntu/ jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
     # 安装系统依赖
     apt-get update && \
     apt-get install -y --no-install-recommends libopus0 ffmpeg && \
-    # 清理缓存
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
