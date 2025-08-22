@@ -53,7 +53,7 @@ const Messages = () => {
               <div className="h-10 w-10 overflow-hidden">
                 <img
                   className="h-full w-full rounded-full object-cover"
-                  src={message.user.profile.img ?? '/avatars/default.webp'}
+                  src={message.user.profile.img || '/avatars/default.webp'}
                   alt="avatar"
                 />
               </div>

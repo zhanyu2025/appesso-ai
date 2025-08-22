@@ -10,15 +10,6 @@ const getAllChatsOfUser = async (req, res, next) => {
   if (!user) {
     return res.status(404).json({ error: '用户不存在' });
   }
-  const device = await prisma.ai_device.findFirst({
-    where: {
-      owner_id: user.id,
-    },
-  });
-
-  if (!device) {
-    return res.status(200).json([]);
-  }
   try {
     const startedChats = await prisma.ai_agent_chat_history.findMany({
       where: {

@@ -63,7 +63,7 @@ const Chat = () => {
             <div className="h-6 w-6 overflow-hidden">
               <img
                 className="h-full w-full rounded-full object-cover"
-                src={data.user.profile.img ?? '/avatars/default.webp'}
+                src={data.user.profile.img || '/avatars/default.webp'}
                 alt="avatar"
               />
             </div>
