@@ -140,8 +140,8 @@ public class ConfigServiceImpl implements ConfigService {
         String referenceAudio = null;
         String referenceText = null;
 
-        // 根据 deviceId 获取 device_role 信息
-        ProfileEntity profile = profileService.getByUserId(device.getOwnerId());
+        // 根据 device 的chat_user_id 获取 个人资料信息
+        ProfileEntity profile = profileService.getByUserId(device.getChatUserId());
         if (profile != null) {
             // 根据 profile 获取 system prompt,  信息
             systemPrompt = profile.getSystemPrompt();
