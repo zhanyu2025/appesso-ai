@@ -18,21 +18,8 @@ WORKDIR /opt/xiaozhi-esp32-server
 
 # 更换为腾讯云Ubuntu镜像源并解决GPG签名问题
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gnupg && \
-    # 下载并导入腾讯云镜像源的GPG密钥
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 871920D1991BC93C && \
-    # 创建sources.list文件
-    echo "deb http://mirrors.tencent.com/ubuntu/ jammy main restricted universe multiverse" > /etc/apt/sources.list && \
-    echo "deb http://mirrors.tencent.com/ubuntu/ jammy-security main restricted universe multiverse" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.tencent.com/ubuntu/ jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
-    # 更新源并安装系统依赖
-    apt-get update && \
     apt-get install -y --no-install-recommends libopus0 ffmpeg && \
-    # 清理缓存和不需要的包
-    apt-get remove -y gnupg && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get clean
 
 # 从构建阶段复制Python包和前端构建产物
 COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
