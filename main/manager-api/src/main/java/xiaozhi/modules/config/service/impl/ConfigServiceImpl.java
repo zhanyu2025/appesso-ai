@@ -33,14 +33,12 @@ import xiaozhi.modules.agent.service.AgentService;
 import xiaozhi.modules.agent.service.AgentTemplateService;
 import xiaozhi.modules.agent.vo.AgentVoicePrintVO;
 import xiaozhi.modules.config.service.ConfigService;
+import xiaozhi.modules.app.entity.ProfileEntity;
+import xiaozhi.modules.app.service.ProfileService;
 import xiaozhi.modules.device.entity.DeviceEntity;
-import xiaozhi.modules.device.entity.DeviceRoleEntity;
-import xiaozhi.modules.device.service.IDeviceRoleService;
 import xiaozhi.modules.device.service.DeviceService;
 import xiaozhi.modules.model.entity.ModelConfigEntity;
 import xiaozhi.modules.model.service.ModelConfigService;
-import xiaozhi.modules.role.entity.RoleEntity;
-import xiaozhi.modules.role.service.IRoleService;
 import xiaozhi.modules.sys.dto.SysParamsDTO;
 import xiaozhi.modules.sys.service.SysParamsService;
 import xiaozhi.modules.timbre.service.TimbreService;
@@ -68,9 +66,7 @@ public class ConfigServiceImpl implements ConfigService {
     @Autowired
     private AgentMcpAccessPointService agentMcpAccessPointService;
     @Autowired
-    private IDeviceRoleService deviceRoleService; // 注入 IDeviceRoleService
-    @Autowired
-    private IRoleService roleService; // 注入 IRoleService
+    private ProfileService profileService; // 注入 ProfileService
     @Autowired // 添加 Autowired
     private AgentVoicePrintDao agentVoicePrintDao;
 
@@ -140,32 +136,28 @@ public class ConfigServiceImpl implements ConfigService {
         // --- 新增逻辑：通过 device 找到绑定的角色 role，并获取 system_prompt, tts_model_id, tts_voice_id ---
         String systemPrompt = agent.getSystemPrompt();
         String ttsModelId = agent.getTtsModelId();
-        String ttsVoice = null;
+        String ttsVoiceId = null;
         String referenceAudio = null;
         String referenceText = null;
 
         // 根据 deviceId 获取 device_role 信息
-        DeviceRoleEntity deviceRole = deviceRoleService.getDeviceRoleByDeviceId(device.getId());
-        if (deviceRole != null) {
-            // 根据 roleId 获取 role 信息
-            RoleEntity role = roleService.getRoleById(deviceRole.getRoleId());
-            if (role != null) {
-                systemPrompt = role.getSystemPrompt();
-                ttsModelId = role.getTtsModelId();
-                // 获取音色信息 (根据 role 的 ttsVoiceId)
-                ttsVoice = role.getTtsVoiceId();
-                TimbreDetailsVO timbre = timbreService.get(role.getTtsVoiceId());
-                if (timbre != null) {
-                    ttsVoice = timbre.getTtsVoice();
-                    referenceAudio = timbre.getReferenceAudio();
-                    referenceText = timbre.getReferenceText();
-                }
+        ProfileEntity profile = profileService.getByUserId(device.getOwnerId());
+        if (profile != null) {
+            // 根据 profile 获取 system prompt,  信息
+            systemPrompt = profile.getSystemPrompt();
+            ttsModelId = profile.getTtsModelId();
+            ttsVoiceId = profile.getTtsVoiceId();
+            TimbreDetailsVO timbre = timbreService.get(profile.getTtsVoiceId());
+            if (timbre != null) {
+                ttsVoiceId = timbre.getTtsVoice();
+                referenceAudio = timbre.getReferenceAudio();
+                referenceText = timbre.getReferenceText();
             }
         } else {
             // 如果没有找到 device_role，则继续使用 agent 的 ttsVoiceId 获取音色信息
             TimbreDetailsVO timbre = timbreService.get(agent.getTtsVoiceId());
             if (timbre != null) {
-                ttsVoice = timbre.getTtsVoice();
+                ttsVoiceId = timbre.getTtsVoice();
                 referenceAudio = timbre.getReferenceAudio();
                 referenceText = timbre.getReferenceText();
             }
@@ -220,26 +212,25 @@ public class ConfigServiceImpl implements ConfigService {
         buildVoiceprintConfig(agent.getId(), result);
 
         // 构建模块配置
-        // 构建模块配置
         buildModuleConfig(
                 agent.getAgentName(),
-                systemPrompt, // 使用从 role 或 agent 获取的 systemPrompt
+                systemPrompt, // 使用从 个人资料 获取的 systemPrompt
                 agent.getSummaryMemory(),
-                ttsVoice, // 使用从 role 或 agent 获取的 ttsVoice
+                ttsVoiceId, // 使用从 个人资料 获取的 ttsVoice
                 referenceAudio,
                 referenceText,
                 agent.getVadModelId(),
                 agent.getAsrModelId(),
                 agent.getLlmModelId(), // 确保这个是 agent 的 llmModelId
                 agent.getVllmModelId(),
-                ttsModelId, // 这个是我们从 role 获得的 ttsModelId
+                ttsModelId, // 这个是我们从 个人资料 获得的 ttsModelId
                 agent.getMemModelId(),
                 agent.getIntentModelId(),
                 result,
                 true); // isCache
 
         System.out.println("ttsModelId: " + ttsModelId); // 添加打印语句
-        System.out.println("ttsVoice: " + ttsVoice); // 添加打印语句
+        System.out.println("ttsVoiceId: " + ttsVoiceId); // 添加打印语句
         System.out.println("result: " + result); // 添加打印语句
 
         return result;

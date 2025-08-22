@@ -21,8 +21,6 @@ import xiaozhi.modules.agent.service.AgentService;
 import xiaozhi.modules.agent.service.biz.AgentChatHistoryBizService;
 import xiaozhi.modules.device.entity.DeviceEntity;
 import xiaozhi.modules.device.service.DeviceService;
-import xiaozhi.modules.device.service.IDeviceRoleService;
-import xiaozhi.modules.device.entity.DeviceRoleEntity;
 
 /**
  * {@link AgentChatHistoryBizService} impl
@@ -40,7 +38,6 @@ public class AgentChatHistoryBizServiceImpl implements AgentChatHistoryBizServic
     private final AgentChatAudioService agentChatAudioService;
     private final RedisUtils redisUtils;
     private final DeviceService deviceService;
-    private final IDeviceRoleService ideviceRoleService;
 
     /**
      * 处理聊天记录上报，包括文件上传和相关信息记录
@@ -68,8 +65,12 @@ public class AgentChatHistoryBizServiceImpl implements AgentChatHistoryBizServic
         // 获取设备信息和deviceId
         DeviceEntity device = deviceService.getDeviceByMacAddress(macAddress);
         String deviceId = null;
+        String ownerId = null;
+        String chatUserId = null;
         if (device != null) {
             deviceId = device.getId();
+            ownerId = device.getOwnerId();
+            chatUserId = device.getChatUserId();
             // 更新设备最后连接时间
             deviceService.updateDeviceConnectionInfo(agentId, deviceId, null);
         } else {
@@ -77,10 +78,10 @@ public class AgentChatHistoryBizServiceImpl implements AgentChatHistoryBizServic
         }
 
         if (Objects.equals(chatHistoryConf, Constant.ChatHistoryConfEnum.RECORD_TEXT.getCode())) {
-            saveChatText(report, agentId, macAddress, deviceId, null, reportTimeMillis);
+            saveChatText(report, agentId, macAddress, deviceId, ownerId, chatUserId, null, reportTimeMillis);
         } else if (Objects.equals(chatHistoryConf, Constant.ChatHistoryConfEnum.RECORD_TEXT_AUDIO.getCode())) {
             String audioId = saveChatAudio(report);
-            saveChatText(report, agentId, macAddress, deviceId, audioId, reportTimeMillis);
+            saveChatText(report, agentId, macAddress, deviceId, ownerId, chatUserId,  audioId, reportTimeMillis);
         }
 
         // 更新设备最后对话时间
@@ -111,31 +112,23 @@ public class AgentChatHistoryBizServiceImpl implements AgentChatHistoryBizServic
     /**
      * 组装上报数据
      */
-    private void saveChatText(AgentChatHistoryReportDTO report, String agentId, String macAddress, String deviceId, String audioId, Long reportTime) {
-        // 构建聊天记录实体
-        String roleId = null;
-        if (deviceId != null) {
-            DeviceRoleEntity deviceRole = ideviceRoleService.getDeviceRoleByDeviceId(deviceId);
-            if (deviceRole != null) {
-                roleId = deviceRole.getRoleId();
-            }
-        }
-
+    private void saveChatText(AgentChatHistoryReportDTO report, String agentId, String macAddress, String deviceId, String ownerId, String chatUserId,String audioId, Long reportTime) {
+        // 构建聊天记录实体 userId, participantId
         AgentChatHistoryEntity entity = AgentChatHistoryEntity.builder()
                 .macAddress(macAddress)
                 .agentId(agentId)
-                .roleId(roleId) // 添加 roleId
+                .userId(ownerId) // 添加 userId
+                .participantId(chatUserId) // 添加 participantId
                 .sessionId(report.getSessionId())
                 .chatType(report.getChatType())
                 .content(report.getContent())
                 .audioId(audioId)
                 .createdAt(new Date(reportTime))
-                // NOTE(haotian): 2025/5/26 updateAt可以不设置，重点是createAt，而且这样可以看到上报延迟
                 .build();
 
         // 保存数据
         agentChatHistoryService.save(entity);
 
-        log.info("设备 {} 对应智能体 {} 上报成功", macAddress, agentId);
+        log.info("设备 {} 对应智能体 {} 用户{} 聊天用户{} 上报成功", macAddress, agentId, ownerId, chatUserId);
     }
 }

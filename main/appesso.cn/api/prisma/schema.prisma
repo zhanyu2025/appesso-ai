@@ -153,8 +153,8 @@ model ai_device {
   create_date       DateTime? @db.DateTime(0)
   updater           BigInt?
   update_date       DateTime? @db.DateTime(0)
-  ownerId           String?   @db.VarChar(32)
-  chatUserId        String?   @db.VarChar(32)
+  owner_id          String?   @db.VarChar(32)
+  chat_user_id      String?   @db.VarChar(32)
 
   @@index([mac_address], map: "idx_ai_device_created_at")
 }

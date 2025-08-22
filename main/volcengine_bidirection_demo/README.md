@@ -19,3 +19,8 @@ python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H
 python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC- --voice_type S_h4j01t0C1 --text "Hello 大家好，我是猿素咖啡-莫恋， 这个时代，平台在变，风口在变，算法也在变，唯一不变的，是你有没有能力，将自己的知识体系化，并用清晰的文字持续地表达出来。"
 
 python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC- --voice_type S_Xj0QPp2C1 --text "Hello 大家好，我是猿素咖啡-猿佬-姚虎， 这个时代，平台在变，风口在变，算法也在变，唯一不变的，是你有没有能力，将自己的知识体系化，并用清晰的文字持续地表达出来。"
+
+python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC- --voice_type S_hIJNWK5C1 --text "Hello 大家好，我是猿素咖啡-猿佬-麦小乐， 这个时代，平台在变，风口在变，算法也在变，唯一不变的，是你有没有能力，将自己的知识体系化，并用清晰的文字持续地表达出来。"
+
+
+python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC- --voice_type S_BW90HQ5C1 --text "Hello 大家好，我是猿素咖啡-猿佬-Altria， 这个时代，平台在变，风口在变，算法也在变，唯一不变的，是你有没有能力，将自己的知识体系化，并用清晰的文字持续地表达出来。"

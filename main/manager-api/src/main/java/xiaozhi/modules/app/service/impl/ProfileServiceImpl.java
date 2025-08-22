@@ -8,6 +8,7 @@ import xiaozhi.modules.app.dao.ProfileDao;
 import xiaozhi.modules.app.dto.ProfileDTO;
 import xiaozhi.modules.app.entity.ProfileEntity;
 import xiaozhi.modules.app.service.ProfileService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import java.time.LocalDateTime;
 
@@ -18,11 +19,9 @@ public class ProfileServiceImpl extends BaseServiceImpl<ProfileDao, ProfileEntit
     private final ProfileDao profileDao;
 
     @Override
-    public void save(ProfileDTO dto) {
-        ProfileEntity entity = ConvertUtils.sourceToTarget(dto, ProfileEntity.class);
-        if (entity.getCreateAt() == null) {
-            entity.setCreateAt(LocalDateTime.now());
-        }
-        insert(entity);
+    public ProfileEntity getByUserId(String userId) {
+        QueryWrapper<ProfileEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        return baseDao.selectOne(wrapper);
     }
 }

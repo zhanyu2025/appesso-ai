@@ -5,5 +5,5 @@ import xiaozhi.modules.app.entity.ProfileEntity;
 import xiaozhi.modules.app.dto.ProfileDTO;
 
 public interface ProfileService extends BaseService<ProfileEntity> {
-    void save(ProfileDTO dto);
+    ProfileEntity getByUserId(String userId);
 }

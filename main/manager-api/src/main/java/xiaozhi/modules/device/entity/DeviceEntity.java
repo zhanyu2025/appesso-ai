@@ -25,6 +25,12 @@ public class DeviceEntity {
     @Schema(description = "关联用户ID")
     private Long userId;
 
+    @Schema(description = "设备用户ID")
+    private String ownerId;
+
+    @Schema(description = "设备绑定聊天用户ID")
+    private String chatUserId;
+
     @Schema(description = "MAC地址")
     private String macAddress;
 

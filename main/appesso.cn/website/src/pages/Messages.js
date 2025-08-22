@@ -1,8 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useQuery } from 'react-query';
 
-import dayjs from '../utils/day';
-
 import Spinner from '../components/Spinner';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../contexts/auth-context';
@@ -13,7 +11,7 @@ const Messages = () => {
   usePageTitle('消息 / 猿星球');
   const { isAuthenticated } = useAuth();
   const messagesQuery = useQuery(
-    ['roles'],
+    ['chats'],
     async () => {
       try {
         const response = await axios.get(`/api/chat/all`);
@@ -34,7 +32,6 @@ const Messages = () => {
         <Spinner />
       </div>
     );
-  console.log(messagesQuery.data);
   if (messagesQuery?.isError) return <div>出现了错误，请稍后再试。</div>;
   return (
     <div className="flex sm:h-full">
@@ -43,20 +40,20 @@ const Messages = () => {
           <PageHeader title="消息" />
         </div>
         <div className="flex flex-col mx-6">
-          {messagesQuery?.data.roles?.map((role) => (
+          {messagesQuery?.data.map((message) => (
             <NavLink
-              to={`${role.id}`}
+              to={`${message.id}`}
               className={({ isActive }) =>
                 isActive
                   ? 'flex px-4 py-2 items-center gap-1 bg-on-surface/10'
                   : 'flex px-4 py-2 items-center gap-1'
               }
-              key={role.id}
+              key={message.id}
             >
               <div className="h-10 w-10 overflow-hidden">
                 <img
                   className="h-full w-full rounded-full object-cover"
-                  src={role.user.profile.img ?? '/avatars/default.webp'}
+                  src={message.user.profile.img ?? '/avatars/default.webp'}
                   alt="avatar"
                 />
               </div>
@@ -64,16 +61,16 @@ const Messages = () => {
                 <div className="flex justify-between">
                   <div className="flex gap-1 items-center">
                     <h3 className="font-bold text-on-surface">
-                      {role.user.profile.name}
+                      {message.user.profile.name}
                     </h3>
                     <span className="text-on-surface/70 font-semibold text-sm">
-                      @{role.user.username}
+                      @{message.user.username}
                     </span>
                   </div>
                 </div>
                 <div className="flex justify-between">
                   <p className="text-on-surface/80 font-medium empty:after:content-['']  empty:inline-block">
-                    {role.lastChatContent}
+                    {message.content}
                   </p>
                 </div>
               </div>

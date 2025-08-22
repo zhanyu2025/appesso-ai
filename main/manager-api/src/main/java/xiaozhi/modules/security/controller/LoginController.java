@@ -141,13 +141,6 @@ public class LoginController {
         userDTO.setPassword(login.getPassword());
         sysUserService.save(userDTO);
 
-        // 如果是手机号码注册，则同步创建User表和Profile表记录
-
-        if (ValidatorUtils.isValidLocalPhone(login.getUsername())) {
-            SysUserDTO sysUserDao = sysUserService.getByUsername(login.getUsername());
-            sysUserService.createAppUserAndProfile(sysUserDao.getId());
-        }
-
         return new Result<>();
     }
 

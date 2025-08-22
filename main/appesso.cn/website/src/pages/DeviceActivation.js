@@ -23,7 +23,7 @@ const DeviceActivation = () => {
   );
 
   const mutation = useMutation(({ code, chatUserId }) => {
-    return axios.post(`/api/devices/activation`, { code, chatUserId });
+    return axios.post(`/api/users/me/devices/activation`, { code, chatUserId });
   });
 
   const validate = useCallback((values) => {

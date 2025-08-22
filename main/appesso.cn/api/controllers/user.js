@@ -65,7 +65,7 @@ const getMyDevices = async (req, res, next) => {
     }
     const devices = await prisma.ai_device.findMany({
       where: {
-        ownerId: user.id,
+        owner_id: user.id,
       },
     });
     return res.status(200).json(devices);
@@ -173,7 +173,7 @@ const activateMyDevice = async (req, res, next) => {
         id: chatUserId,
       },
     });
-    const agent = await prisma.User.findFirst({});
+    const agent = await prisma.ai_agent.findFirst({});
     if (!user) {
       return res.status(401).json({
         message: '用户不存在。',
@@ -195,8 +195,8 @@ const activateMyDevice = async (req, res, next) => {
     const deviceData = {
       id: deviceId, // 使用从Redis获取的deviceId作为主键，String类型
       user_id: BigInt(userId), // user_id 是 BigInt 类型
-      ownerId: user.id,
-      chatUserId: chatUser.id,
+      owner_id: user.id,
+      chat_user_id: chatUser.id,
       mac_address: cacheMap.mac_address || null, // 从Redis获取
       board: cacheMap.board || null, // 从Redis获取
       app_version: cacheMap.app_version || null, // 从Redis获取
@@ -264,16 +264,24 @@ const updateMyConnectedDevice = async (req, res, next) => {
   if (!chatUser) {
     return res.status(404).json({ error: '选择的聊天用户不存在' });
   }
+  const device = await prisma.ai_device.findFirst({
+    where: {
+      owner_id: user.id,
+    },
+  });
+  if (!device) {
+    return res.status(404).json({ error: '当前用户未绑定任何设备。' });
+  }
   try {
-    const device = await prisma.ai_device.update({
+    const updated = await prisma.ai_device.update({
       where: {
-        ownerId: user.id,
+        id: device.id,
       },
       data: {
-        chatUserId,
+        chat_user_id: chatUserId,
       },
     });
-    return res.status(200).json(device);
+    return res.status(200).json(updated);
   } catch (error) {
     return next(error);
   }

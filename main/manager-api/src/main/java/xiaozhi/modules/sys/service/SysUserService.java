@@ -72,10 +72,4 @@ public interface SysUserService extends BaseService<SysUserEntity> {
      * @return 是否允许用户注册
      */
     boolean getAllowUserRegister();
-
-    /**
-     * 创建 App User 表和 Profile 表记录
-     * @param sysUserId sys_user 表的 ID
-     */
-    void createAppUserAndProfile(Long sysUserId);
 }

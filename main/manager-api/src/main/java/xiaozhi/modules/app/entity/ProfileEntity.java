@@ -18,6 +18,12 @@ public class ProfileEntity implements Serializable {
     private String id; // 与 Prisma schema 中的 @id @unique @db.VarChar(32) 对应
     @TableField("user_id")
     private String userId; // 与 Prisma schema 中的 user_id String @unique @db.VarChar(32) 对应
+    @TableField("tts_model_id")
+    private String ttsModelId;
+    @TableField("tts_voice_id")
+    private String ttsVoiceId;
+    @TableField("system_prompt")
+    private String systemPrompt;
     private String name; // 与 Prisma schema 中的 name String @db.VarChar(50) 对应
     private String img; // 与 Prisma schema 中的 img String? @db.VarChar(4000) 对应
     private String website; // 与 Prisma schema 中的 website String? @db.VarChar(100) 对应

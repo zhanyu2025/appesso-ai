@@ -44,10 +44,16 @@ public class AgentChatHistoryEntity {
     private String agentId;
 
     /**
-     * 角色ID
+     * 用户ID
      */
-    @TableField(value = "role_id")
-    private String roleId;
+    @TableField(value = "user_id")
+    private String userId;
+
+    /**
+     * 参与者ID
+     */
+    @TableField(value = "participant_id")
+    private String participantId;
 
     /**
      * 会话ID

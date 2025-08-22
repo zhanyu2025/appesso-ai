@@ -8,6 +8,8 @@
     <result column="mac_address" jdbcType="VARCHAR" property="macAddress" />
     <result column="agent_id" jdbcType="VARCHAR" property="agentId" />
     <result column="session_id" jdbcType="VARCHAR" property="sessionId" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="chat_user_id" jdbcType="VARCHAR" property="chatUserId" />
     <result column="sort" jdbcType="BIGINT" property="sort" />
     <result column="chat_type" jdbcType="TINYINT" property="chatType" />
     <result column="content" jdbcType="VARCHAR" property="content" />
@@ -18,19 +20,19 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, mac_address, agent_id, session_id, sort, chat_type, content, audio, audio_url, 
+    id, mac_address, agent_id, session_id, sort, chat_type, content, audio, audio_url,
     created_at, updated_at
   </sql>
 
   <delete id="deleteAudioByAgentId">
-    DELETE FROM ai_agent_chat_audio 
+    DELETE FROM ai_agent_chat_audio
     WHERE id IN (
-      SELECT audio_id 
-      FROM ai_agent_chat_history 
+      SELECT audio_id
+      FROM ai_agent_chat_history
       WHERE agent_id = #{agentId}
     )
   </delete>
-  
+
   <update id="deleteAudioIdByAgentId">
     UPDATE ai_agent_chat_history
     SET audio_id = NULL
@@ -38,7 +40,7 @@
   </update>
 
   <delete id="deleteHistoryByAgentId">
-    DELETE FROM ai_agent_chat_history 
+    DELETE FROM ai_agent_chat_history
     WHERE agent_id = #{agentId}
   </delete>
 </mapper>

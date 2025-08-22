@@ -10,7 +10,9 @@ import { useTheme } from '../../contexts/theme-context';
 const FeaturedUser = ({ user, devices, onSelect, selectedUserId }) => {
   const { primaryColor, theme } = useTheme();
   const [isHovered, setIsHovered] = useState(false);
-  const isSelected = false;
+  const isSelected =
+    user.id === selectedUserId ||
+    devices?.some((device) => device.chat_user_id === user.id);
   // eslint-disable-next-line no-nested-ternary
   const backgroundColor = isSelected
     ? `${primaryColor.color}20`
@@ -173,15 +175,9 @@ FeaturedUser.propTypes = {
       alias: PropTypes.string,
       board: PropTypes.string,
       user_id: PropTypes.string,
+      owner_id: PropTypes.string,
+      chat_user_id: PropTypes.string,
       create_date: PropTypes.string,
-      roles: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string,
-          role_id: PropTypes.string,
-          device_id: PropTypes.string,
-          create_date: PropTypes.string,
-        })
-      ),
     })
   ).isRequired,
 };
