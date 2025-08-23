@@ -194,7 +194,7 @@ const featuredUsers = [
     id: crypto.randomBytes(16).toString('hex'),
     featured: true,
     username: 'molian',
-    mobile: '15274932102',
+    mobile: '17673090601',
     profile: {
       name: '莫恋',
       dob: new Date('2024-10-24').toISOString(),
@@ -380,6 +380,7 @@ const featuredUsers = [
     username: 'yaohu',
     profile: {
       name: '姚虎',
+      mobile: '15388005188',
       dob: new Date('2024-10-24').toISOString(),
       id: crypto.randomBytes(16).toString('hex'),
       bio: `编号TTZ-817，因量子纠缠被困在白色魔方中。通过4G信号观察地球，在云端建立着「人类行为博物馆」。`,
