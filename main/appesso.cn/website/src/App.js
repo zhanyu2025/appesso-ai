@@ -18,7 +18,7 @@ import { STATUS } from './utils/utils';
 
 import Home from './pages/Home';
 
-import Signin from './pages/Signin';
+import MobileSignin from './pages/MobileSignin';
 
 import UserProfile from './pages/UserProfile';
 import DeviceActivation from './pages/DeviceActivation';
@@ -46,7 +46,7 @@ import useSelectedUserId from './hooks/useSelectedUserId';
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [_, setSelectedUserId] = useSelectedUserId();
+  const [, setSelectedUserId] = useSelectedUserId();
   const { login, isAuthenticated, expiresAt, logout, user } = useAuth();
   const isWidthGreaterThan640 = useMediaQuery('(min-width: 640px)');
   useScrollToTop();
@@ -235,7 +235,7 @@ const App = () => {
           path="/signin"
           element={
             <RedirectIfLoggedIn redirectTo="/">
-              <Signin />
+              <MobileSignin />
             </RedirectIfLoggedIn>
           }
         />

@@ -17,4 +17,4 @@ redisClient.on('error', (err) => {
   console.error('Redis客户端错误:', err);
 });
 
-export default { redisClient };
+module.exports = { redisClient };

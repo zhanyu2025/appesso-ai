@@ -49,9 +49,17 @@ def encode_audio_file(file_path):
 if __name__ == "__main__":
     appid = "7820115171"
     token = "o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC-"
+<<<<<<< Updated upstream
     spk_id = "S_BW90HQ5C1"
     print("appid = ", appid)
     print("token = ", token)
     print("spk_id = ", spk_id)
     train(appid=appid, token=token, audio_path="./audios/altria_first.mp3", spk_id=spk_id)
+=======
+    spk_id = "S_10jFs89C1"
+    print("appid = ", appid)
+    print("token = ", token)
+    print("spk_id = ", spk_id)
+    train(appid=appid, token=token, audio_path="./audios/haitang_second.mp3", spk_id=spk_id)
+>>>>>>> Stashed changes
     get_status(appid=appid, token=token, spk_id=spk_id)

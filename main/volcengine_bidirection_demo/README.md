@@ -24,3 +24,21 @@ python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H
 
 
 python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC- --voice_type S_BW90HQ5C1 --text "Hello 大家好，我是猿素咖啡-猿佬-Altria， 这个时代，平台在变，风口在变，算法也在变，唯一不变的，是你有没有能力，将自己的知识体系化，并用清晰的文字持续地表达出来。"
+<<<<<<< Updated upstream
+=======
+
+
+python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC- --voice_type S_jRDQm89C1 --text "Hello 大家好，我是猿素咖啡-猿佬-Moly， 这个时代，平台在变，风口在变，算法也在变，唯一不变的，是你有没有能力，将自己的知识体系化，并用清晰的文字持续地表达出来。"
+
+python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC- --voice_type S_10jFs89C1 --text "Hello 大家好，我是猿素咖啡-猿佬-海棠， 这个时代，平台在变，风口在变，算法也在变，唯一不变的，是你有没有能力，将自己的知识体系化，并用清晰的文字持续地表达出来。"
+
+
+
+python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC- --voice_type S_vX5vIe9C1 --text "Hello 大家好，我是猿素咖啡-猿佬-瑶瑶， 这个时代，平台在变，风口在变，算法也在变，唯一不变的，是你有没有能力，将自己的知识体系化，并用清晰的文字持续地表达出来。"
+
+
+python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC- --voice_type S_zFd0Cv9C1 --text "Hello 大家好，我是猿素咖啡-猿佬-观自， 这个时代，平台在变，风口在变，算法也在变，唯一不变的，是你有没有能力，将自己的知识体系化，并用清晰的文字持续地表达出来。"
+
+
+python3 examples/volcengine/bidirection.py --appid 7820115171 --access_token o2H8GJLh9eO-7kuzzyw93To2iJ1C6YC- --voice_type S_10jFs89C1 --text "Hello 大家好，我是猿素咖啡-猿佬-海棠， 这个时代，平台在变，风口在变，算法也在变，唯一不变的，是你有没有能力，将自己的知识体系化，并用清晰的文字持续地表达出来。"
+>>>>>>> Stashed changes

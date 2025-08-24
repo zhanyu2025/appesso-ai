@@ -2,14 +2,17 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { useCallback, useRef, useState } from 'react';
 
-import TextInput from './TextInput';
-import Button from './Button';
-
+import TextInput from '../components/TextInput';
+import Button from '../components/Button';
 import axios from '../utils/axios';
+
 import useForm from '../hooks/useForm';
 import { useAuth } from '../contexts/auth-context';
 
-const SigninForm = () => {
+import usePageTitle from '../hooks/usePageTitle';
+
+const MobileSignin = () => {
+  usePageTitle('手机号登录 / 猿星球');
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
@@ -288,4 +291,4 @@ const SigninForm = () => {
   );
 };
 
-export default SigninForm;
+export default MobileSignin;

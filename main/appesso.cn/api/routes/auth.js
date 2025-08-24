@@ -15,10 +15,10 @@ const {
 const router = express.Router();
 
 router.post(
-  '/mobile/codes', // Changed route for mobile login
-  checkSchema(mobileSchema), // Using new mobile login schema
+  '/send/mobile/code',
+  checkSchema(mobileSchema),
   validateRequest,
-  authController.sendMobileCode // Assuming this new controller method will be created
+  authController.sendMobileCode
 );
 
 router.post(
